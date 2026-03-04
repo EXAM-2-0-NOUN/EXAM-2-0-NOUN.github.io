@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CIT 217 Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .page { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 20px; font-weight: 700; }
+      .timer { font-weight: 700; }
+      .layout { display: grid; grid-template-columns: 1fr 290px; gap: 16px; }
+      .card { background: var(--panel); border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; }
+      .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); }
+      .section-badge { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 999px; padding: 4px 10px; }
+      .q-text { font-size: 18px; margin: 14px 0; }
+      .options { display: grid; gap: 10px; }
+      .option { display: flex; gap: 10px; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+      .option:hover { border-color: var(--accent); }
+      .blank-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 15px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-ghost { background: #e2e8f0; color: var(--ink); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .progress { margin-top: 10px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .q-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 8px 0; cursor: pointer; }
+      .q-btn.active { border-color: var(--accent); background: #dbeafe; }
+      .q-btn.answered { border-color: var(--ok); background: #dcfce7; }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .grid { grid-template-columns: repeat(8, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">CIT 217 Exam (70 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:00:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 70</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 70 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const rawQuestions = [
+        { id: 1, section: "A", type: "blank", text: "Sequential programming executes instructions in a __________ order.", answer: "sequential" },
+        { id: 2, section: "A", type: "blank", text: "In sequential programs, statements are executed from top to __________.", answer: "bottom" },
+        { id: 3, section: "A", type: "blank", text: "A variable must be __________ before it is used.", answer: "declared" },
+        { id: 4, section: "A", type: "blank", text: "The process of giving a variable its first value is called __________.", answer: "initialization" },
+        { id: 5, section: "A", type: "blank", text: "A constant is a value that cannot be __________ during execution.", answer: "changed (modified)" },
+        { id: 6, section: "A", type: "blank", text: "The symbol '=' is known as the __________ operator.", answer: "assignment" },
+        { id: 7, section: "A", type: "blank", text: "Data entered into a program is called __________.", answer: "input" },
+        { id: 8, section: "A", type: "blank", text: "The result produced by a program is called __________.", answer: "output" },
+        { id: 9, section: "A", type: "blank", text: "An algorithm is a step-by-step procedure for solving a __________.", answer: "problem" },
+        { id: 10, section: "A", type: "blank", text: "A flowchart uses __________ symbols to represent steps in a program.", answer: "standard (flowchart)" },
+        { id: 11, section: "A", type: "blank", text: "The oval symbol in a flowchart represents __________ and end.", answer: "start" },
+        { id: 12, section: "A", type: "blank", text: "The parallelogram symbol represents __________ and output.", answer: "input" },
+        { id: 13, section: "A", type: "blank", text: "The rectangle symbol represents a __________.", answer: "process" },
+        { id: 14, section: "A", type: "blank", text: "A syntax error occurs when programming rules are __________.", answer: "violated" },
+        { id: 15, section: "A", type: "blank", text: "A runtime error occurs during program __________.", answer: "execution" },
+        { id: 16, section: "A", type: "blank", text: "A logical error affects the __________ of a program.", answer: "output (result)" },
+        { id: 17, section: "A", type: "blank", text: "A data type that stores whole numbers is called __________.", answer: "integer (int)" },
+        { id: 18, section: "A", type: "blank", text: "A data type that stores decimal numbers is called __________.", answer: "float (real)" },
+        { id: 19, section: "A", type: "blank", text: "A single character is stored using the __________ data type.", answer: "character (char)" },
+        { id: 20, section: "A", type: "blank", text: "A collection of characters is called a __________.", answer: "string" },
+        { id: 21, section: "A", type: "blank", text: "Comments in a program are used for __________ purposes.", answer: "documentation" },
+        { id: 22, section: "A", type: "blank", text: "The process of finding and correcting errors is called __________.", answer: "debugging" },
+        { id: 23, section: "A", type: "blank", text: "Sequential programming does not involve __________ structures.", answer: "control" },
+        { id: 24, section: "A", type: "blank", text: "The step-by-step design of a solution before coding is called __________.", answer: "algorithm design" },
+        { id: 25, section: "A", type: "blank", text: "An identifier must not start with a __________.", answer: "number (digit)" },
+        { id: 26, section: "A", type: "blank", text: "Reserved words are also known as __________.", answer: "keywords" },
+        { id: 27, section: "A", type: "blank", text: "The execution of instructions one after another is called __________ execution.", answer: "sequential" },
+        { id: 28, section: "A", type: "blank", text: "A program written in high-level language must be __________ before execution.", answer: "compiled" },
+        { id: 29, section: "A", type: "blank", text: "The program that translates source code to machine code is called a __________.", answer: "compiler" },
+        { id: 30, section: "A", type: "blank", text: "The smallest unit of data in computing is a __________.", answer: "bit" },
+        { id: 31, section: "A", type: "blank", text: "A group of related instructions performing a task is called a __________.", answer: "function" },
+        { id: 32, section: "A", type: "blank", text: "The memory used to store variables during execution is called __________ memory.", answer: "main (primary)" },
+        { id: 33, section: "A", type: "blank", text: "In pseudocode, instructions are written in simple __________ language.", answer: "English" },
+        { id: 34, section: "A", type: "blank", text: "A well-written algorithm must be clear and __________.", answer: "finite" },
+        { id: 35, section: "A", type: "blank", text: "Sequential programming is best suited for __________ tasks.", answer: "simple" },
+
+        { id: 36, section: "B", type: "mcq", text: "Sequential programming executes statements:", options: ["Randomly", "Simultaneously", "One after another", "In parallel"], answer: "One after another" },
+        { id: 37, section: "B", type: "mcq", text: "Which of the following is NOT a data type?", options: ["Integer", "Float", "Loop", "Character"], answer: "Loop" },
+        { id: 38, section: "B", type: "mcq", text: "The purpose of a flowchart is to:", options: ["Compile code", "Represent algorithm graphically", "Execute program", "Debug automatically"], answer: "Represent algorithm graphically" },
+        { id: 39, section: "B", type: "mcq", text: "Which symbol represents a process in a flowchart?", options: ["Oval", "Rectangle", "Diamond", "Parallelogram"], answer: "Rectangle" },
+        { id: 40, section: "B", type: "mcq", text: "A syntax error can be detected during:", options: ["Execution", "Compilation", "Printing", "Input"], answer: "Compilation" },
+        { id: 41, section: "B", type: "mcq", text: "Which of the following stores decimal numbers?", options: ["int", "char", "float", "void"], answer: "float" },
+        { id: 42, section: "B", type: "mcq", text: "The assignment operator is used to:", options: ["Compare values", "Assign values", "Delete values", "Multiply values"], answer: "Assign values" },
+        { id: 43, section: "B", type: "mcq", text: "An algorithm must be:", options: ["Ambiguous", "Infinite", "Clear and finite", "Complex"], answer: "Clear and finite" },
+        { id: 44, section: "B", type: "mcq", text: "Which of the following is used for program documentation?", options: ["Variables", "Comments", "Operators", "Constants"], answer: "Comments" },
+        { id: 45, section: "B", type: "mcq", text: "Runtime errors occur during:", options: ["Coding", "Compilation", "Execution", "Designing"], answer: "Execution" },
+        { id: 46, section: "B", type: "mcq", text: "Which of the following is a whole number data type?", options: ["float", "int", "char", "string"], answer: "int" },
+        { id: 47, section: "B", type: "mcq", text: "Pseudocode is written in:", options: ["Binary", "Assembly", "Machine code", "Simple English-like statements"], answer: "Simple English-like statements" },
+        { id: 48, section: "B", type: "mcq", text: "The diamond symbol in a flowchart represents:", options: ["Start", "Decision", "Process", "Input"], answer: "Decision" },
+        { id: 49, section: "B", type: "mcq", text: "Sequential programming mainly follows which structure?", options: ["Selection", "Iteration", "Sequence", "Parallel"], answer: "Sequence" },
+        { id: 50, section: "B", type: "mcq", text: "Which of the following is an example of output?", options: ["Keyboard entry", "Mouse click", "Printed result", "Source code"], answer: "Printed result" },
+        { id: 51, section: "B", type: "mcq", text: "A logical error results in:", options: ["Compilation failure", "Wrong output", "System crash always", "No execution"], answer: "Wrong output" },
+        { id: 52, section: "B", type: "mcq", text: "Which of the following translates high-level language?", options: ["Debugger", "Compiler", "Editor", "Loader"], answer: "Compiler" },
+        { id: 53, section: "B", type: "mcq", text: "An identifier cannot contain:", options: ["Letters", "Numbers", "Special symbols like #", "Underscore"], answer: "Special symbols like #" },
+        { id: 54, section: "B", type: "mcq", text: "The start and end symbols in a flowchart are:", options: ["Rectangle", "Oval", "Diamond", "Parallelogram"], answer: "Oval" },
+        { id: 55, section: "B", type: "mcq", text: "The memory location of a variable is determined during:", options: ["Editing", "Execution", "Printing", "Flowcharting"], answer: "Execution" },
+        { id: 56, section: "B", type: "mcq", text: "Which of the following is NOT an error type?", options: ["Syntax", "Logical", "Runtime", "Structural metal"], answer: "Structural metal" },
+        { id: 57, section: "B", type: "mcq", text: "Sequential programming is best for:", options: ["Complex AI systems", "Simple step-by-step tasks", "Parallel processing", "Networking"], answer: "Simple step-by-step tasks" },
+        { id: 58, section: "B", type: "mcq", text: "A constant differs from a variable because it:", options: ["Changes frequently", "Cannot change", "Is always zero", "Is temporary"], answer: "Cannot change" },
+        { id: 59, section: "B", type: "mcq", text: "Input devices include:", options: ["Monitor", "Printer", "Keyboard", "Speaker"], answer: "Keyboard" },
+        { id: 60, section: "B", type: "mcq", text: "Which of the following is NOT part of an algorithm?", options: ["Input", "Processing", "Output", "Hardware design"], answer: "Hardware design" },
+        { id: 61, section: "B", type: "mcq", text: "A compiler converts source code into:", options: ["English", "Pseudocode", "Machine code", "Flowchart"], answer: "Machine code" },
+        { id: 62, section: "B", type: "mcq", text: "Debugging is done to:", options: ["Add features", "Remove errors", "Print code", "Compile twice"], answer: "Remove errors" },
+        { id: 63, section: "B", type: "mcq", text: "The process of writing program code is called:", options: ["Designing", "Coding", "Testing", "Flowcharting"], answer: "Coding" },
+        { id: 64, section: "B", type: "mcq", text: "A float data type stores:", options: ["Text", "Whole numbers", "Decimal numbers", "Characters"], answer: "Decimal numbers" },
+        { id: 65, section: "B", type: "mcq", text: "Which of the following is a valid identifier?", options: ["2value", "value_1", "int", "#total"], answer: "value_1" },
+        { id: 66, section: "B", type: "mcq", text: "Sequential programs generally do NOT include:", options: ["Statements", "Variables", "Loops", "Parallel execution"], answer: "Parallel execution" },
+        { id: 67, section: "B", type: "mcq", text: "The purpose of comments is to:", options: ["Execute faster", "Explain code", "Increase errors", "Replace variables"], answer: "Explain code" },
+        { id: 68, section: "B", type: "mcq", text: "The smallest unit of information is:", options: ["Byte", "Bit", "Word", "File"], answer: "Bit" },
+        { id: 69, section: "B", type: "mcq", text: "A byte consists of:", options: ["2 bits", "4 bits", "8 bits", "16 bits"], answer: "8 bits" },
+        { id: 70, section: "B", type: "mcq", text: "The main aim of programming is to:", options: ["Confuse the computer", "Solve problems logically", "Damage hardware", "Increase complexity"], answer: "Solve problems logically" }
+      ];
+
+      const sectionAAnswers = [
+        "sequential",
+        "bottom",
+        "declared",
+        "initialization",
+        "changed (modified)",
+        "assignment",
+        "input",
+        "output",
+        "problem",
+        "standard (flowchart)",
+        "start",
+        "input",
+        "process",
+        "violated",
+        "execution",
+        "output (result)",
+        "integer (int)",
+        "float (real)",
+        "character (char)",
+        "string",
+        "documentation",
+        "debugging",
+        "control",
+        "algorithm design",
+        "number (digit)",
+        "keywords",
+        "sequential",
+        "compiled",
+        "compiler",
+        "bit",
+        "function",
+        "main (primary)",
+        "English",
+        "finite",
+        "simple"
+      ];
+
+      const sectionBAnswerLetters = [
+        "C", "C", "B", "B", "B", "C", "B", "C", "B", "C",
+        "B", "D", "B", "C", "C", "B", "B", "C", "B", "B",
+        "D", "B", "B", "C", "D", "C", "B", "B", "C", "B",
+        "D", "B", "B", "C", "B"
+      ];
+
+      rawQuestions.forEach((q) => {
+        if (q.id >= 1 && q.id <= 35) {
+          q.answer = sectionAAnswers[q.id - 1];
+          return;
+        }
+        if (q.id >= 36 && q.id <= 70 && Array.isArray(q.options)) {
+          const letter = sectionBAnswerLetters[q.id - 36];
+          const optionIndex = letter.charCodeAt(0) - 65;
+          if (optionIndex >= 0 && optionIndex < q.options.length) {
+            q.answer = q.options[optionIndex];
+          }
+        }
+      });
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 60 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        localStorage.setItem("lastExamPage", "cit217.html");
+
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = { total: totalQuestions, score: score, results: results };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      localStorage.setItem("lastExamPage", "cit217.html");
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,332 @@
+[
+  {
+    "id": 1,
+    "text": "Under dynamic , all processes that use alanguage library executeonly one copy of the librarycode",
+    "options": [],
+    "answer": "linking"
+  },
+  {
+    "id": 2,
+    "text": "In a system that selectsvictims for rollback primarilyon the basis of cost factors, may occur",
+    "options": [],
+    "answer": "starvation"
+  },
+  {
+    "id": 3,
+    "text": "For the Banker's algorithmto work, it needs to know things",
+    "options": [],
+    "answer": "three 3"
+  },
+  {
+    "id": 4,
+    "text": "The task of terminating athread before it hascompleted is called thread",
+    "options": [],
+    "answer": "cancellation"
+  },
+  {
+    "id": 5,
+    "text": "signals are delivered to thesame process thatperformed the operationcausing the signal",
+    "options": [],
+    "answer": "Synchronous"
+  },
+  {
+    "id": 6,
+    "text": "In capacity buffer, the sendermust block until therecipient receives themessage",
+    "options": [],
+    "answer": "Zero"
+  },
+  {
+    "id": 7,
+    "text": "An I/O-bound programwould typically have manyvery short bursts",
+    "options": [],
+    "answer": "CPU centralprocessingunit"
+  },
+  {
+    "id": 8,
+    "text": "The is the module that givescontrol of the CPU to theprocess selected by theshort-term scheduler",
+    "options": [],
+    "answer": "dispatcher"
+  },
+  {
+    "id": 9,
+    "text": "Time is the interval from thetime of submission of aprocess to the time ofcompletion",
+    "options": [],
+    "answer": "Turnaround"
+  },
+  {
+    "id": 10,
+    "text": "A solution to indefiniteblocking of low-priorityprocesses is",
+    "options": [],
+    "answer": "aging"
+  },
+  {
+    "id": 11,
+    "text": "The first problem inselecting a schedulingalgorithm is defining the to be used",
+    "options": [],
+    "answer": "criteria"
+  },
+  {
+    "id": 12,
+    "text": "Analytical methods of CPUscheduling algorithmevaluation use analysis to determine theperformance of analgorithm",
+    "options": [],
+    "answer": "mathematical"
+  },
+  {
+    "id": 13,
+    "text": "is a technique of graduallyincreasing the priority ofprocesses that wait in thesystem for a long time",
+    "options": [],
+    "answer": "Aging"
+  },
+  {
+    "id": 14,
+    "text": "synchronization refers tothe idea of keeping multiplecopies of a dataset incoherence with oneanother.",
+    "options": [],
+    "answer": "Data"
+  },
+  {
+    "id": 15,
+    "text": "The concept of logical-address space that isbound to a separatephysical-address space is to proper memorymanagement",
+    "options": [],
+    "answer": "central"
+  },
+  {
+    "id": 16,
+    "text": "Deadlock requires that the operatingsystem be given in advanceadditional informationconcerning which resourcesa process will request anduse during its lifetime",
+    "options": [],
+    "answer": "avoidance"
+  },
+  {
+    "id": 17,
+    "text": "The behaviour of theprocesses unsafe states",
+    "options": [],
+    "answer": "controls"
+  },
+  {
+    "id": 18,
+    "text": "deadlocks are deadlocksthat are detected in adistributed system but don'tactually exist .",
+    "options": [],
+    "answer": "Phantom"
+  },
+  {
+    "id": 19,
+    "text": "deadlocks can occur indistributed systems whendistributed transactions orconcurrency control isbeing used",
+    "options": [],
+    "answer": "Distributed"
+  },
+  {
+    "id": 20,
+    "text": "The goal of is to shuffle the memorycontents to place all freememory together in onelarge block",
+    "options": [],
+    "answer": "compaction"
+  },
+  {
+    "id": 21,
+    "text": "The selection of the first-fitversus best-fit strategiescan affect the amount of",
+    "options": [],
+    "answer": "fragmentation"
+  },
+  {
+    "id": 22,
+    "text": "The decision to place theoperating system in eitherlow memory or highmemory is affected by thelocation of the vector",
+    "options": [],
+    "answer": "interrupt"
+  },
+  {
+    "id": 23,
+    "text": "With dynamic linking, a is included in the image foreach library-routinereference",
+    "options": [],
+    "answer": "stub"
+  },
+  {
+    "id": 24,
+    "text": "The advantage of dynamicloading is that an routine is never loaded",
+    "options": [],
+    "answer": "unused"
+  },
+  {
+    "id": 25,
+    "text": "Paging is a form of relocation",
+    "options": [],
+    "answer": "dynamic"
+  },
+  {
+    "id": 26,
+    "text": "Every logical address isbounded by the paginghardware to some address",
+    "options": [],
+    "answer": "physical"
+  },
+  {
+    "id": 27,
+    "text": "A nanokernel is a very operating system kernel",
+    "options": [],
+    "answer": "minimalist"
+  },
+  {
+    "id": 28,
+    "text": "With dynamic loading, aroutine is not loaded until itis",
+    "options": [],
+    "answer": "called"
+  },
+  {
+    "id": 29,
+    "text": "As processes enter thesystem, they are put into an queue",
+    "options": [],
+    "answer": "input"
+  },
+  {
+    "id": 30,
+    "text": "In the -time address-bindingscheme, the logical- andphysical-address spacesdiffer",
+    "options": [],
+    "answer": "execution"
+  },
+  {
+    "id": 31,
+    "text": "An address generated bythe CPU is commonlyreferred to as address",
+    "options": [],
+    "answer": "logical"
+  },
+  {
+    "id": 32,
+    "text": "Communication betweenprocesses takes place by to send and receiveprimitives",
+    "options": [],
+    "answer": "calls"
+  },
+  {
+    "id": 33,
+    "text": "Thread management inmany-to-one model is donein space",
+    "options": [],
+    "answer": "user"
+  },
+  {
+    "id": 34,
+    "text": "With dynamic loading, allroutines are kept on disk ina format",
+    "options": [],
+    "answer": "relocatable"
+  },
+  {
+    "id": 35,
+    "text": "A thread that is to becancelled is often referredas the thread.",
+    "options": [],
+    "answer": "target"
+  },
+  {
+    "id": 36,
+    "text": "The advantage of loading is that an unusedroutine is never loaded",
+    "options": [],
+    "answer": "dynamic"
+  },
+  {
+    "id": 37,
+    "text": "In deadlock avoidancealgorithms, the system onlygrants request that will leadto states",
+    "options": [],
+    "answer": "safe"
+  },
+  {
+    "id": 38,
+    "text": "In message passing, thebounded and unboundedcapacity buffer is referred toas buffering",
+    "options": [],
+    "answer": "automatic"
+  },
+  {
+    "id": 39,
+    "text": "All wait-free algorithms are -free",
+    "options": [],
+    "answer": "lock"
+  },
+  {
+    "id": 40,
+    "text": "In a real system, CPUutilization should rangefrom percent to 90 percent",
+    "options": [],
+    "answer": "40"
+  },
+  {
+    "id": 41,
+    "text": "is the number of processescompleted per time unit",
+    "options": [],
+    "answer": "throughput"
+  },
+  {
+    "id": 42,
+    "text": "deadlocks are deadlocksthat are detected in adistributed system but don'tactually exist",
+    "options": [],
+    "answer": "Phantom"
+  },
+  {
+    "id": 43,
+    "text": "addressing allows thekernel to make a givenphysical address appear tobe another address",
+    "options": [],
+    "answer": "Virtual"
+  },
+  {
+    "id": 44,
+    "text": "Dynamic does not require specialsupport from the operatingsystem",
+    "options": [],
+    "answer": "loading"
+  },
+  {
+    "id": 45,
+    "text": "The problem withsemaphores is that they aretoo level in nature",
+    "options": [],
+    "answer": "low"
+  },
+  {
+    "id": 46,
+    "text": "scheduling is simple andeasy to implement, andstarvation-free",
+    "options": [],
+    "answer": "Round-robin RR"
+  },
+  {
+    "id": 47,
+    "text": "The code is sometimes calledtext section.",
+    "options": [],
+    "answer": "program"
+  },
+  {
+    "id": 48,
+    "text": "A queue consists of allprocesses in the system.",
+    "options": [],
+    "answer": "job"
+  },
+  {
+    "id": 49,
+    "text": "When both the send andreceive primitives of acommunication areblocking, we have a between the sender and thereceiver.",
+    "options": [],
+    "answer": "rendezvous"
+  },
+  {
+    "id": 50,
+    "text": "The act of switching theCPU to another processrequires saving the state ofthe old process and loadingthe saved state for the newprocess. This task is knownas",
+    "options": [],
+    "answer": "Contextswitching"
+  },
+  {
+    "id": 51,
+    "text": "Fibers are supported the kernel",
+    "options": [],
+    "answer": "above"
+  },
+  {
+    "id": 52,
+    "text": "Deterministic modelling is atype of evaluation",
+    "options": [],
+    "answer": "analytical"
+  },
+  {
+    "id": 53,
+    "text": "In capacity buffer, the sendercan continue the executionwithout waiting",
+    "options": [],
+    "answer": "Bounded"
+  },
+  {
+    "id": 54,
+    "text": "When a context switchoccurs, the saves the context of the oldprocess in its PCB andloads the saved context ofthe new process scheduledto run",
+    "options": [],
+    "answer": "kernel"
+  },
+  {
+    "id": 55,
+    "text": "requires a backing store",
+    "options": [],
+    "answer": "swapping"
+  }
+]

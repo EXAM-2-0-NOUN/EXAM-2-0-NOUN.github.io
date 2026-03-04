@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CIT 215 Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .page { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 20px; font-weight: 700; }
+      .timer { font-weight: 700; }
+      .layout { display: grid; grid-template-columns: 1fr 290px; gap: 16px; }
+      .card { background: var(--panel); border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; }
+      .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); }
+      .section-badge { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 999px; padding: 4px 10px; }
+      .q-text { font-size: 18px; margin: 14px 0; }
+      .options { display: grid; gap: 10px; }
+      .option { display: flex; gap: 10px; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+      .option:hover { border-color: var(--accent); }
+      .blank-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 15px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-ghost { background: #e2e8f0; color: var(--ink); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .progress { margin-top: 10px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .q-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 8px 0; cursor: pointer; }
+      .q-btn.active { border-color: var(--accent); background: #dbeafe; }
+      .q-btn.answered { border-color: var(--ok); background: #dcfce7; }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .grid { grid-template-columns: repeat(8, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">CIT 215 Exam (70 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:00:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 70</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 70 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const rawQuestions = [
+        { id: 1, section: "A", type: "blank", text: "A programming language is a formal language used to communicate instructions to a __________.", answer: "computer" },
+        { id: 2, section: "A", type: "blank", text: "The rules that define the structure of a programming language are called __________.", answer: "syntax" },
+        { id: 3, section: "A", type: "blank", text: "The meaning of statements in a programming language is called __________.", answer: "semantics" },
+        { id: 4, section: "A", type: "blank", text: "A program that translates source code into machine code is called a __________.", answer: "compiler" },
+        { id: 5, section: "A", type: "blank", text: "A program that translates and executes code line by line is called an __________.", answer: "interpreter" },
+        { id: 6, section: "A", type: "blank", text: "A programming language that is close to machine language is called __________ level language.", answer: "low" },
+        { id: 7, section: "A", type: "blank", text: "Languages like C and Java are classified as __________ level languages.", answer: "high" },
+        { id: 8, section: "A", type: "blank", text: "A variable is a named location in __________.", answer: "memory" },
+        { id: 9, section: "A", type: "blank", text: "The process of converting source code to object code is called __________.", answer: "compilation" },
+        { id: 10, section: "A", type: "blank", text: "The smallest individual unit in a program is called a __________.", answer: "token" },
+        { id: 11, section: "A", type: "blank", text: "A group of related instructions performing a task is called a __________.", answer: "function" },
+        { id: 12, section: "A", type: "blank", text: "The process of finding and fixing errors in a program is called __________.", answer: "debugging" },
+        { id: 13, section: "A", type: "blank", text: "An error detected during program execution is called __________ error.", answer: "runtime" },
+        { id: 14, section: "A", type: "blank", text: "An error that violates grammar rules is called __________ error.", answer: "syntax" },
+        { id: 15, section: "A", type: "blank", text: "A loop that executes as long as a condition is true is called a __________ loop.", answer: "while" },
+        { id: 16, section: "A", type: "blank", text: "The decision-making statement in programming is called __________ statement.", answer: "if" },
+        { id: 17, section: "A", type: "blank", text: "The act of giving an initial value to a variable is called __________.", answer: "initialization" },
+        { id: 18, section: "A", type: "blank", text: "A constant is a value that cannot be __________ during execution.", answer: "changed" },
+        { id: 19, section: "A", type: "blank", text: "Object-oriented programming is based on the concept of __________ and objects.", answer: "classes" },
+        { id: 20, section: "A", type: "blank", text: "In OOP, hiding internal details is known as __________.", answer: "encapsulation" },
+        { id: 21, section: "A", type: "blank", text: "The ability of one class to inherit properties from another is called __________.", answer: "inheritance" },
+        { id: 22, section: "A", type: "blank", text: "The feature that allows methods to have the same name but different implementations is called __________.", answer: "polymorphism" },
+        { id: 23, section: "A", type: "blank", text: "A language that supports multiple programming paradigms is called __________ language.", answer: "multi-paradigm" },
+        { id: 24, section: "A", type: "blank", text: "The reserved words in a programming language are called __________.", answer: "keywords" },
+        { id: 25, section: "A", type: "blank", text: "The memory allocated during runtime is called __________ memory.", answer: "heap" },
+        { id: 26, section: "A", type: "blank", text: "A collection of characters is known as a __________.", answer: "string" },
+        { id: 27, section: "A", type: "blank", text: "The operator used to assign values is called __________ operator.", answer: "assignment" },
+        { id: 28, section: "A", type: "blank", text: "A function that does not return a value is called __________ function.", answer: "void" },
+        { id: 29, section: "A", type: "blank", text: "Machine language consists of binary digits called __________.", answer: "bits" },
+        { id: 30, section: "A", type: "blank", text: "A program written in assembly language requires an __________ to translate it.", answer: "assembler" },
+        { id: 31, section: "A", type: "blank", text: "The structure that allows repetition of a block of code is called __________ structure.", answer: "looping" },
+        { id: 32, section: "A", type: "blank", text: "The process of dividing a program into smaller parts is called __________.", answer: "modularization" },
+        { id: 33, section: "A", type: "blank", text: "A flowchart is a __________ representation of an algorithm.", answer: "graphical" },
+        { id: 34, section: "A", type: "blank", text: "An algorithm is a step-by-step procedure for solving a __________.", answer: "problem" },
+        { id: 35, section: "A", type: "blank", text: "The time taken by a program to execute is referred to as __________ time.", answer: "execution" },
+
+        { id: 36, section: "B", type: "mcq", text: "Which of the following is a high-level programming language?", options: ["Machine language", "Assembly language", "C", "Binary"], answer: "C" },
+        { id: 37, section: "B", type: "mcq", text: "A compiler translates the entire program into:", options: ["English", "Machine code", "Comments", "Flowcharts"], answer: "Machine code" },
+        { id: 38, section: "B", type: "mcq", text: "Which of the following is NOT a programming paradigm?", options: ["Procedural", "Object-Oriented", "Functional", "Mechanical"], answer: "Mechanical" },
+        { id: 39, section: "B", type: "mcq", text: "The main advantage of high-level languages is:", options: ["Hardware dependency", "Portability", "Complexity", "Binary coding"], answer: "Portability" },
+        { id: 40, section: "B", type: "mcq", text: "Which of the following is an example of an interpreted language?", options: ["C", "C++", "Python", "Assembly"], answer: "Python" },
+        { id: 41, section: "B", type: "mcq", text: "The smallest unit of a program is:", options: ["Variable", "Token", "Loop", "Class"], answer: "Token" },
+        { id: 42, section: "B", type: "mcq", text: "Which error occurs due to violation of grammar rules?", options: ["Logical error", "Syntax error", "Runtime error", "Semantic error"], answer: "Syntax error" },
+        { id: 43, section: "B", type: "mcq", text: "Which symbol is commonly used for assignment?", options: ["==", "=", "!=", ">="], answer: "=" },
+        { id: 44, section: "B", type: "mcq", text: "In OOP, a blueprint for creating objects is called:", options: ["Function", "Loop", "Class", "Variable"], answer: "Class" },
+        { id: 45, section: "B", type: "mcq", text: "Encapsulation means:", options: ["Data hiding", "Data deletion", "Data copying", "Data execution"], answer: "Data hiding" },
+        { id: 46, section: "B", type: "mcq", text: "Inheritance promotes:", options: ["Code repetition", "Code reuse", "Code deletion", "Code execution"], answer: "Code reuse" },
+        { id: 47, section: "B", type: "mcq", text: "Polymorphism allows:", options: ["One form only", "Multiple forms", "No form", "Binary form"], answer: "Multiple forms" },
+        { id: 48, section: "B", type: "mcq", text: "Which of the following is NOT a data type?", options: ["Integer", "Float", "Loop", "Character"], answer: "Loop" },
+        { id: 49, section: "B", type: "mcq", text: "A loop that executes at least once is:", options: ["for loop", "while loop", "do-while loop", "switch"], answer: "do-while loop" },
+        { id: 50, section: "B", type: "mcq", text: "Which of the following is used for decision making?", options: ["if statement", "loop", "function", "variable"], answer: "if statement" },
+        { id: 51, section: "B", type: "mcq", text: "Assembly language uses:", options: ["Binary codes only", "Mnemonics", "English sentences", "Flowcharts"], answer: "Mnemonics" },
+        { id: 52, section: "B", type: "mcq", text: "An algorithm must be:", options: ["Ambiguous", "Infinite", "Clear and finite", "Complex"], answer: "Clear and finite" },
+        { id: 53, section: "B", type: "mcq", text: "The memory location of a variable is determined during:", options: ["Execution", "Compilation", "Linking", "Debugging"], answer: "Compilation" },
+        { id: 54, section: "B", type: "mcq", text: "A logical error affects:", options: ["Syntax", "Grammar", "Output correctness", "Compilation"], answer: "Output correctness" },
+        { id: 55, section: "B", type: "mcq", text: "Which of the following translates assembly language?", options: ["Compiler", "Interpreter", "Assembler", "Debugger"], answer: "Assembler" },
+        { id: 56, section: "B", type: "mcq", text: "Procedural programming focuses on:", options: ["Objects", "Functions and procedures", "Hardware", "Graphics"], answer: "Functions and procedures" },
+        { id: 57, section: "B", type: "mcq", text: "A reserved word cannot be used as:", options: ["Keyword", "Identifier", "Command", "Operator"], answer: "Identifier" },
+        { id: 58, section: "B", type: "mcq", text: "Which is an example of procedural language?", options: ["Java", "C", "Python", "Ruby"], answer: "C" },
+        { id: 59, section: "B", type: "mcq", text: "A function primarily helps in:", options: ["Code duplication", "Code reuse", "Hardware control", "Memory deletion"], answer: "Code reuse" },
+        { id: 60, section: "B", type: "mcq", text: "Which of the following is NOT an advantage of OOP?", options: ["Modularity", "Reusability", "Complexity reduction", "No structure"], answer: "No structure" },
+        { id: 61, section: "B", type: "mcq", text: "Source code is written in:", options: ["Machine language", "High-level language", "Binary", "Assembly only"], answer: "High-level language" },
+        { id: 62, section: "B", type: "mcq", text: "Runtime errors occur during:", options: ["Compilation", "Linking", "Execution", "Editing"], answer: "Execution" },
+        { id: 63, section: "B", type: "mcq", text: "A programming paradigm defines:", options: ["Hardware structure", "Coding style and structure", "Disk storage", "CPU design"], answer: "Coding style and structure" },
+        { id: 64, section: "B", type: "mcq", text: "The symbol “==” is used for:", options: ["Assignment", "Comparison", "Addition", "Looping"], answer: "Comparison" },
+        { id: 65, section: "B", type: "mcq", text: "Dynamic typing means:", options: ["Type fixed at compile time", "Type checked at runtime", "No type", "Binary type"], answer: "Type checked at runtime" },
+        { id: 66, section: "B", type: "mcq", text: "Which of the following supports object-oriented programming?", options: ["C", "Java", "Assembly", "Machine language"], answer: "Java" },
+        { id: 67, section: "B", type: "mcq", text: "Debugging is done to:", options: ["Add comments", "Remove errors", "Compile code", "Execute code"], answer: "Remove errors" },
+        { id: 68, section: "B", type: "mcq", text: "Machine language is:", options: ["Portable", "Human-readable", "Hardware dependent", "Object-oriented"], answer: "Hardware dependent" },
+        { id: 69, section: "B", type: "mcq", text: "A structured program improves:", options: ["Confusion", "Readability", "Errors", "Hardware cost"], answer: "Readability" },
+        { id: 70, section: "B", type: "mcq", text: "The main goal of programming languages is to:", options: ["Damage hardware", "Communicate with computer effectively", "Increase errors", "Replace OS"], answer: "Communicate with computer effectively" }
+      ];
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 60 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        localStorage.setItem("lastExamPage", "cit215.html");
+
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = { total: totalQuestions, score: score, results: results };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      localStorage.setItem("lastExamPage", "cit215.html");
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>

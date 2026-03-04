@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exam Portal</title>
+    <style>
+      :root {
+        --bg-1: #0f172a;
+        --bg-2: #1e293b;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #ff7a00;
+        --accent-2: #22c55e;
+        --shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% 10%, #ffedd5, transparent 40%),
+          radial-gradient(circle at 80% 0%, #dbeafe, transparent 35%),
+          linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        color: #fff;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+        margin: 0 0 8px;
+        letter-spacing: 0.3px;
+      }
+
+      .hero p {
+        margin: 0;
+        color: #e2e8f0;
+        max-width: 520px;
+      }
+
+      .badge {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 10px 16px;
+        border-radius: 999px;
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+
+      .section-title {
+        font-size: 20px;
+        margin: 0 0 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .course {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 160px;
+        background: #f8fafc;
+        transition: transform 0.2s ease, border 0.2s ease;
+      }
+
+      .course:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+      }
+
+      .course h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .course p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .course .meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .course a {
+        margin-top: auto;
+        text-decoration: none;
+        background: var(--accent);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .course a.secondary {
+        background: var(--accent-2);
+      }
+
+      .info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .info-card {
+        background: #0f172a;
+        color: #fff;
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .info-card h4 {
+        margin: 0 0 6px;
+      }
+
+      .info-card p {
+        margin: 0;
+        color: #cbd5f5;
+        font-size: 13px;
+      }
+
+      @media (max-width: 720px) {
+        .hero h1 {
+          font-size: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="hero">
+        <div>
+          <div class="badge">Exam Portal</div>
+          <h1>Choose Your Course Exam</h1>
+          <p>
+            Select a course to begin. Each exam can have a different number of
+            questions. Make sure you are ready before starting.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title">Available Courses</h2>
+        <div class="grid">
+          <div class="course">
+            <h3>CIT 211</h3>
+            <p>Course exam page for CIT 211.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1:30 Hour</span>
+            </div>
+            <a href="cit211.html">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>CIT 215</h3>
+            <p>Course exam page for CIT 215.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="cit215.html" class="secondary">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>CIT 217</h3>
+            <p>Course exam page for CIT 217.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="cit217.html">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>CIT 237</h3>
+            <p>Course exam page for CIT 237.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1:30 Hour</span>
+            </div>
+            <a href="cit237.html" class="secondary">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>GST 201</h3>
+            <p>Course exam page for GST 201.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="gst201.html">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>GST 203</h3>
+            <p>Course exam page for GST 203.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="gst203.html" class="secondary">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>MTH 281</h3>
+            <p>Course exam page for MTH 281.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1:30 Hour</span>
+            </div>
+            <a href="mth281.html">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>MTH 102</h3>
+            <p>Course exam page for MTH 102.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="mth102.html" class="secondary">Start Exam</a>
+          </div>
+          <div class="course">
+            <h3>CIT 104</h3>
+            <p>Course exam page for CIT 104.</p>
+            <div class="meta">
+              <span>Questions vary by upload</span>
+              <span>1 Hour</span>
+            </div>
+            <a href="cit104.html">Start Exam</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="info-card">
+          <h4>Exam Rules</h4>
+          <p>Timer starts immediately. No pause. Submit before time ends.</p>
+        </div>
+        <div class="info-card">
+          <h4>Support</h4>
+          <p>Contact your instructor if the page does not load properly.</p>
+        </div>
+        <div class="info-card">
+          <h4>Preparation</h4>
+          <p>Review course notes and practice questions before starting.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

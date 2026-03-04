@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GST 203 Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .page { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 20px; font-weight: 700; }
+      .timer { font-weight: 700; }
+      .layout { display: grid; grid-template-columns: 1fr 290px; gap: 16px; }
+      .card { background: var(--panel); border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; }
+      .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); }
+      .section-badge { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 999px; padding: 4px 10px; }
+      .q-text { font-size: 18px; margin: 14px 0; }
+      .options { display: grid; gap: 10px; }
+      .option { display: flex; gap: 10px; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+      .option:hover { border-color: var(--accent); }
+      .blank-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 15px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-ghost { background: #e2e8f0; color: var(--ink); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .progress { margin-top: 10px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .q-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 8px 0; cursor: pointer; }
+      .q-btn.active { border-color: var(--accent); background: #dbeafe; }
+      .q-btn.answered { border-color: var(--ok); background: #dcfce7; }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .grid { grid-template-columns: repeat(8, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">GST 203 Exam (70 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:00:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 70</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 70 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sectionABlanks = [
+        { text: "Entrepreneurship is the process of creating something new with value by devoting necessary time and __________.", answer: "effort" },
+        { text: "An entrepreneur is someone who organizes and manages a business and takes __________.", answer: "risks" },
+        { text: "Innovation involves introducing new __________ or ideas.", answer: "products" },
+        { text: "A business plan is a written document that describes a business idea and its __________.", answer: "operations" },
+        { text: "The ability to identify business opportunities is known as opportunity __________.", answer: "recognition" },
+        { text: "Small and Medium Enterprises are commonly abbreviated as __________.", answer: "SMEs" },
+        { text: "Risk-taking is a major characteristic of an __________.", answer: "entrepreneur" },
+        { text: "Capital refers to the financial __________ used to start a business.", answer: "resources" },
+        { text: "Feasibility study helps determine the __________ of a business idea.", answer: "viability" },
+        { text: "Leadership involves influencing others to achieve organizational __________.", answer: "goals" },
+        { text: "Creativity is the ability to generate new and useful __________.", answer: "ideas" },
+        { text: "A sole proprietorship is owned by __________ person.", answer: "one" },
+        { text: "Partnership is a business owned by __________ or more persons.", answer: "two" },
+        { text: "A limited liability company has a separate legal __________.", answer: "entity" },
+        { text: "Marketing involves identifying and satisfying customer __________.", answer: "needs" },
+        { text: "SWOT analysis stands for Strengths, Weaknesses, Opportunities and __________.", answer: "Threats" },
+        { text: "Bootstrapping refers to starting a business with little or no external __________.", answer: "funding" },
+        { text: "Venture capital is a source of __________ financing.", answer: "equity" },
+        { text: "Business ethics deals with moral principles guiding business __________.", answer: "behavior" },
+        { text: "An entrepreneur must possess good decision-making __________.", answer: "skills" },
+        { text: "Economic development can be enhanced through __________ activities.", answer: "entrepreneurial" },
+        { text: "Innovation can be incremental or __________.", answer: "radical" },
+        { text: "A franchise is a business arrangement between a franchisor and a __________.", answer: "franchisee" },
+        { text: "The process of turning ideas into action is called __________.", answer: "entrepreneurship" },
+        { text: "Networking helps entrepreneurs gain access to information and __________.", answer: "resources" }
+      ];
+
+      const sectionBMcq = [
+        { text: "Entrepreneurship primarily involves:", options: ["Government employment", "Risk avoidance", "Opportunity exploitation", "Salary earning"], answer: "Opportunity exploitation" },
+        { text: "An entrepreneur is best described as a person who:", options: ["Avoids challenges", "Takes calculated risks", "Works only under supervision", "Avoids innovation"], answer: "Takes calculated risks" },
+        { text: "Innovation refers to:", options: ["Copying existing products", "Creating or improving products", "Avoiding competition", "Reducing quality"], answer: "Creating or improving products" },
+        { text: "Which of the following is NOT a characteristic of entrepreneurs?", options: ["Initiative", "Creativity", "Fear of risk", "Persistence"], answer: "Fear of risk" },
+        { text: "Opportunity recognition is important because it:", options: ["Prevents competition", "Identifies potential business ideas", "Reduces profit", "Eliminates customers"], answer: "Identifies potential business ideas" },
+
+        { text: "A business plan is important for:", options: ["Entertainment", "Securing funding", "Avoiding taxation", "Personal use only"], answer: "Securing funding" },
+        { text: "The executive summary appears in the:", options: ["Marketing plan", "Financial plan", "Beginning of a business plan", "Conclusion only"], answer: "Beginning of a business plan" },
+        { text: "A feasibility study helps to:", options: ["Increase risk", "Assess viability", "Avoid planning", "Eliminate customers"], answer: "Assess viability" },
+        { text: "SWOT analysis evaluates:", options: ["Financial records", "Internal and external factors", "Employees only", "Customers only"], answer: "Internal and external factors" },
+        { text: "Market analysis focuses on:", options: ["Production only", "Customer needs and competition", "Government policy only", "Religion"], answer: "Customer needs and competition" },
+
+        { text: "A sole proprietorship is owned by:", options: ["Two persons", "Shareholders", "One individual", "Government"], answer: "One individual" },
+        { text: "Partnership involves a minimum of:", options: ["One person", "Two persons", "Five persons", "Ten persons"], answer: "Two persons" },
+        { text: "A limited liability company:", options: ["Has no legal identity", "Is owned by one person only", "Has separate legal existence", "Cannot make profit"], answer: "Has separate legal existence" },
+        { text: "Franchise arrangement involves:", options: ["Two governments", "Franchisor and franchisee", "Shareholders only", "Banks only"], answer: "Franchisor and franchisee" },
+        { text: "Cooperative societies are formed mainly to:", options: ["Maximize individual profit", "Promote mutual benefits", "Avoid taxation", "Compete unfairly"], answer: "Promote mutual benefits" },
+
+        { text: "SMEs contribute to:", options: ["Unemployment", "Economic growth", "Political crisis", "Inflation only"], answer: "Economic growth" },
+        { text: "Venture capital is provided by:", options: ["Government employees", "Private investors", "Customers", "Competitors"], answer: "Private investors" },
+        { text: "Bootstrapping means:", options: ["Borrowing heavily", "Using personal savings", "Avoiding capital", "Selling shares publicly"], answer: "Using personal savings" },
+        { text: "A loan from a bank is a form of:", options: ["Equity financing", "Debt financing", "Grant", "Donation"], answer: "Debt financing" },
+        { text: "Angel investors are individuals who:", options: ["Offer donations only", "Invest personal funds in startups", "Work for banks", "Avoid risk"], answer: "Invest personal funds in startups" },
+
+        { text: "Leadership skill enables an entrepreneur to:", options: ["Avoid workers", "Influence and guide others", "Work alone", "Eliminate competition"], answer: "Influence and guide others" },
+        { text: "Time management helps to:", options: ["Waste resources", "Improve productivity", "Reduce efficiency", "Increase confusion"], answer: "Improve productivity" },
+        { text: "Creativity helps entrepreneurs to:", options: ["Copy others", "Generate new ideas", "Avoid competition", "Reduce innovation"], answer: "Generate new ideas" },
+        { text: "Decision-making involves:", options: ["Guessing", "Choosing among alternatives", "Ignoring problems", "Avoiding risks"], answer: "Choosing among alternatives" },
+        { text: "Communication skill is important for:", options: ["Isolation", "Networking and negotiation", "Conflict only", "Laziness"], answer: "Networking and negotiation" },
+
+        { text: "Business ethics concerns:", options: ["Legal punishment only", "Moral standards in business", "Political campaigns", "Personal hobbies"], answer: "Moral standards in business" },
+        { text: "Corporate social responsibility involves:", options: ["Ignoring society", "Contributing to community welfare", "Avoiding taxes", "Increasing pollution"], answer: "Contributing to community welfare" },
+        { text: "Entrepreneurship reduces:", options: ["Employment", "Innovation", "Poverty", "Development"], answer: "Poverty" },
+        { text: "Economic development is enhanced by:", options: ["Business creation", "Unemployment", "Conflict", "Corruption"], answer: "Business creation" },
+        { text: "Globalization affects entrepreneurship by:", options: ["Limiting markets", "Expanding markets", "Reducing technology", "Eliminating trade"], answer: "Expanding markets" },
+
+        { text: "Risk management helps to:", options: ["Increase uncertainty", "Reduce potential losses", "Avoid planning", "Eliminate profit"], answer: "Reduce potential losses" },
+        { text: "A mission statement defines the firm’s:", options: ["Daily expenses", "Purpose", "Location", "Employees"], answer: "Purpose" },
+        { text: "Vision statement describes the firm’s:", options: ["Past", "Present", "Future direction", "Failures"], answer: "Future direction" },
+        { text: "Break-even point is where:", options: ["Loss equals profit", "Revenue equals cost", "Sales stop", "Taxes increase"], answer: "Revenue equals cost" },
+        { text: "Innovation is important for:", options: ["Business stagnation", "Competitive advantage", "Market exit", "Isolation"], answer: "Competitive advantage" },
+        { text: "Entrepreneurship education aims to:", options: ["Discourage business", "Develop entrepreneurial mindset", "Promote unemployment", "Avoid leadership"], answer: "Develop entrepreneurial mindset" },
+        { text: "An intrapreneur works within:", options: ["Government only", "Existing organization", "No organization", "Foreign country"], answer: "Existing organization" },
+        { text: "Networking benefits entrepreneurs through:", options: ["Isolation", "Information sharing", "Conflict", "Competition only"], answer: "Information sharing" },
+        { text: "The primary aim of profit is to:", options: ["Cause conflict", "Sustain business growth", "Increase losses", "Avoid customers"], answer: "Sustain business growth" },
+        { text: "Customer satisfaction leads to:", options: ["Business failure", "Repeat patronage", "Market loss", "Conflict"], answer: "Repeat patronage" },
+        { text: "Competitive advantage helps a firm to:", options: ["Lose customers", "Outperform competitors", "Reduce quality", "Avoid innovation"], answer: "Outperform competitors" },
+        { text: "Entrepreneurial success depends largely on:", options: ["Luck only", "Planning and execution", "Avoiding risks", "Government salary"], answer: "Planning and execution" },
+        { text: "Product differentiation means:", options: ["Selling identical goods", "Making product unique", "Avoiding marketing", "Reducing quality"], answer: "Making product unique" },
+        { text: "Cash flow refers to:", options: ["Profit only", "Movement of money in and out", "Salary", "Loan"], answer: "Movement of money in and out" },
+        { text: "Sustainability in business means:", options: ["Short-term operation", "Long-term survival and growth", "Avoiding customers", "Ignoring profit"], answer: "Long-term survival and growth" }
+      ];
+
+      const rawQuestions = [];
+      sectionABlanks.forEach((q, idx) => {
+        rawQuestions.push({
+          id: idx + 1,
+          section: "A",
+          type: "blank",
+          text: q.text,
+          answer: q.answer
+        });
+      });
+      sectionBMcq.forEach((q, idx) => {
+        rawQuestions.push({
+          id: sectionABlanks.length + idx + 1,
+          section: "B",
+          type: "mcq",
+          text: q.text,
+          options: q.options,
+          answer: q.answer
+        });
+      });
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 60 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        localStorage.setItem("lastExamPage", "gst203.html");
+
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = { total: totalQuestions, score: score, results: results };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      localStorage.setItem("lastExamPage", "gst203.html");
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>

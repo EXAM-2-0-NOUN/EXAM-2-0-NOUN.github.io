@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exam Results</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --good: #16a34a;
+        --bad: #dc2626;
+        --warning: #ca8a04;
+        --border: #e2e8f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 45%);
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 26px auto;
+        padding: 0 16px 30px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .title {
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      .score-chip {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-weight: 700;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(140px, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .stat {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .stat .label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat .value {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+
+      .value.good {
+        color: var(--good);
+      }
+
+      .value.bad {
+        color: var(--bad);
+      }
+
+      .value.warning {
+        color: var(--warning);
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+
+      .actions,
+      .filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-ghost {
+        background: #e2e8f0;
+        color: var(--ink);
+      }
+
+      .btn-filter {
+        background: #f1f5f9;
+        color: var(--ink);
+      }
+
+      .btn-filter.active {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .result-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+
+      .row-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+
+      .q-title {
+        font-weight: 700;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .badge.good {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .badge.bad {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .badge.warning {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .q-text {
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .answers {
+        display: grid;
+        gap: 5px;
+        font-size: 14px;
+      }
+
+      .answers strong {
+        color: var(--ink);
+      }
+
+      .your-answer {
+        color: var(--bad);
+        font-weight: 600;
+      }
+
+      .correct-answer {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .empty {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      @media (max-width: 760px) {
+        .stats {
+          grid-template-columns: repeat(2, minmax(140px, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">Exam Results</div>
+        <div class="score-chip" id="scoreChip">Score</div>
+      </div>
+
+      <div class="stats" id="statsRow"></div>
+
+      <div class="panel">
+        <div class="actions">
+          <button class="btn btn-primary" id="retakeBtn">Retake Exam</button>
+          <button class="btn btn-ghost" id="homeBtn">Back to Exam Page</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="filters">
+          <button class="btn btn-filter active" data-filter="all">All</button>
+          <button class="btn btn-filter" data-filter="correct">Correct</button>
+          <button class="btn btn-filter" data-filter="wrong">Wrong</button>
+          <button class="btn btn-filter" data-filter="unanswered">Unanswered</button>
+        </div>
+      </div>
+
+      <div id="resultsList"></div>
+    </div>
+
+    <script>
+      const scoreChip = document.getElementById("scoreChip");
+      const statsRow = document.getElementById("statsRow");
+      const resultsList = document.getElementById("resultsList");
+      const retakeBtn = document.getElementById("retakeBtn");
+      const homeBtn = document.getElementById("homeBtn");
+      const filterButtons = document.querySelectorAll("[data-filter]");
+
+      const raw = localStorage.getItem("examResults");
+
+      if (!raw) {
+        scoreChip.textContent = "No results found";
+        statsRow.innerHTML = "";
+        resultsList.innerHTML = "<div class='empty'>No results available yet. Take the exam first.</div>";
+      } else {
+        const data = JSON.parse(raw);
+        const total = Number(data.total) || 0;
+        const records = Array.isArray(data.results) ? data.results.slice() : [];
+
+        records.sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
+
+        const correct = records.filter((r) => r.isCorrect).length;
+        const answered = records.filter((r) => String(r.selected || "").trim() !== "").length;
+        const wrong = answered - correct;
+        const unanswered = total - answered;
+        const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        scoreChip.textContent = "Score: " + correct + " / " + total + " (" + percent + "%)";
+        statsRow.innerHTML = [
+          "<div class='stat'><div class='label'>Correct</div><div class='value good'>" + correct + "</div></div>",
+          "<div class='stat'><div class='label'>Wrong</div><div class='value bad'>" + wrong + "</div></div>",
+          "<div class='stat'><div class='label'>Unanswered</div><div class='value warning'>" + unanswered + "</div></div>",
+          "<div class='stat'><div class='label'>Attempted</div><div class='value'>" + answered + "</div></div>"
+        ].join("");
+
+        function statusOf(item) {
+          const selected = String(item.selected || "").trim();
+          if (!selected) return "unanswered";
+          return item.isCorrect ? "correct" : "wrong";
+        }
+
+        function sectionOf(item) {
+          const id = Number(item.id) || 0;
+          return id >= 1 && id <= 40 ? "Section A" : "Section B";
+        }
+
+        function render(filterValue) {
+          const visible = records.filter((item) => {
+            if (filterValue === "all") return true;
+            return statusOf(item) === filterValue;
+          });
+
+          if (visible.length === 0) {
+            resultsList.innerHTML = "<div class='empty'>No questions in this filter.</div>";
+            return;
+          }
+
+          resultsList.innerHTML = "";
+          visible.forEach((item) => {
+            const state = statusOf(item);
+            const statusLabel = state === "correct" ? "Correct" : state === "wrong" ? "Wrong" : "Unanswered";
+            const card = document.createElement("div");
+            card.className = "result-card";
+            card.innerHTML =
+              "<div class='row-top'>" +
+                "<div class='q-title'>Question " + item.id + " (" + sectionOf(item) + ")</div>" +
+                "<span class='badge " + (state === "correct" ? "good" : state === "wrong" ? "bad" : "warning") + "'>" + statusLabel + "</span>" +
+              "</div>" +
+              "<div class='q-text'>" + item.text + "</div>" +
+              "<div class='answers'>" +
+                "<div><strong>Your answer:</strong> <span class='your-answer'>" + (String(item.selected || "").trim() || "No answer") + "</span></div>" +
+                "<div><strong>Correct answer:</strong> <span class='correct-answer'>" + (item.correct || "-") + "</span></div>" +
+              "</div>";
+            resultsList.appendChild(card);
+          });
+        }
+
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            filterButtons.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            render(btn.getAttribute("data-filter"));
+          });
+        });
+
+        render("all");
+      }
+
+      retakeBtn.addEventListener("click", () => {
+        localStorage.removeItem("examResults");
+        const lastExamPage = localStorage.getItem("lastExamPage") || "cit211.html";
+        window.location.href = lastExamPage;
+      });
+
+      homeBtn.addEventListener("click", () => {
+        window.location.href = "exam.html";
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CIT 237 Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .page { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 20px; font-weight: 700; }
+      .timer { font-weight: 700; }
+      .layout { display: grid; grid-template-columns: 1fr 290px; gap: 16px; }
+      .card { background: var(--panel); border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; }
+      .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); }
+      .section-badge { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 999px; padding: 4px 10px; }
+      .q-text { font-size: 18px; margin: 14px 0; }
+      .options { display: grid; gap: 10px; }
+      .option { display: flex; gap: 10px; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+      .option:hover { border-color: var(--accent); }
+      .blank-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 15px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-ghost { background: #e2e8f0; color: var(--ink); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .progress { margin-top: 10px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .q-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 8px 0; cursor: pointer; }
+      .q-btn.active { border-color: var(--accent); background: #dbeafe; }
+      .q-btn.answered { border-color: var(--ok); background: #dcfce7; }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .grid { grid-template-columns: repeat(8, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">CIT 237 Exam (100 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:30:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 100</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 100 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sectionABlanks = [
+        { text: "A __________ is a set of codes that instructs the computer to carry out some processes.", answer: "program" },
+        { text: "Programming is the process of __________ programs.", answer: "developing" },
+        { text: "Machine language consists of binary digits __________ and __________.", answer: "0 and 1" },
+        { text: "Assembly language uses a translator called an __________.", answer: "assembler" },
+        { text: "High-level languages are more __________ friendly than low-level languages.", answer: "user" },
+        { text: "A __________ converts assembly language into machine language.", answer: "assembler" },
+        { text: "A compiler translates the entire source program into __________ code.", answer: "object" },
+        { text: "An interpreter translates source instructions __________ by __________.", answer: "line by line" },
+        { text: "The five stages of program development begin with __________ analysis.", answer: "problem" },
+        { text: "The final stage of program development is __________.", answer: "documentation" },
+        { text: "The process of correcting errors in a program is called __________.", answer: "debugging" },
+        { text: "An error in a program is called a __________.", answer: "bug" },
+        { text: "A __________ is a finite sequence of unambiguous instructions for solving a problem.", answer: "algorithm" },
+        { text: "A correct algorithm must halt with the correct __________ for every input instance.", answer: "output" },
+        { text: "A computational problem specifies the desired __________ relationship.", answer: "input-output" },
+        { text: "The efficiency of an algorithm is measured in terms of __________ and __________.", answer: "time and space" },
+        { text: "Worst-case efficiency considers the __________ input size.", answer: "largest" },
+        { text: "Best-case efficiency considers the __________ input size.", answer: "smallest" },
+        { text: "Order of growth is expressed using __________ notation.", answer: "big O" },
+        { text: "O(n2) represents __________ time complexity.", answer: "quadratic" },
+        { text: "Problems solvable in polynomial time belong to class __________.", answer: "P" },
+        { text: "NP stands for __________ polynomial time.", answer: "nondeterministic" },
+        { text: "A problem that is both in NP and as hard as any NP problem is called __________.", answer: "NP-Complete" },
+        { text: "Merge Sort follows the __________ and conquer technique.", answer: "divide" },
+        { text: "Bubble Sort repeatedly swaps __________ elements.", answer: "adjacent" },
+        { text: "Quick Sort uses a __________ element for partitioning.", answer: "pivot" },
+        { text: "Binary Search works only on a __________ list.", answer: "sorted" },
+        { text: "Selection Sort repeatedly selects the __________ element.", answer: "smallest" },
+        { text: "The program source code must obey the syntactic and __________ rules.", answer: "semantic" },
+        { text: "A linker combines object code with necessary __________.", answer: "libraries" },
+        { text: "Procedural programming uses concepts like loops and __________ statements.", answer: "conditional" },
+        { text: "Object-oriented programming is based on objects and __________.", answer: "classes" },
+        { text: "Functional programming relies heavily on __________.", answer: "recursion" },
+        { text: "Logic programming focuses on what outcome should be __________.", answer: "achieved" },
+        { text: "Event-driven programming responds to __________.", answer: "events" },
+        { text: "Scientific computing focuses on complex mathematical __________.", answer: "computations" },
+        { text: "MIS programs are commonly written in __________ language.", answer: "COBOL" },
+        { text: "The editor allows a program to be retrieved and __________.", answer: "edited" },
+        { text: "The object code is also known as the __________ code.", answer: "machine" },
+        { text: "Testing is an integral part of software __________.", answer: "development" }
+      ];
+
+      const sectionBMcq = [
+        { text: "Which of the following is the lowest level of programming language?", options: ["High-level language", "Assembly language", "Machine language", "Procedural language"], answer: "Machine language" },
+        { text: "Which translator converts high-level language to machine code?", options: ["Assembler", "Compiler", "Loader", "Editor"], answer: "Compiler" },
+        { text: "Which stage comes first in program development?", options: ["Coding", "Testing", "Problem Analysis", "Documentation"], answer: "Problem Analysis" },
+        { text: "Debugging is the process of:", options: ["Writing code", "Removing errors", "Executing code", "Designing flowcharts"], answer: "Removing errors" },
+        { text: "Which tool is used to type and edit programs?", options: ["Compiler", "Loader", "Editor", "Interpreter"], answer: "Editor" },
+
+        { text: "An algorithm must:", options: ["Run forever", "Have ambiguous steps", "Have a beginning and an end", "Be written in C++"], answer: "Have a beginning and an end" },
+        { text: "Which of the following is NOT a characteristic of an algorithm?", options: ["Finite steps", "Ambiguity", "Well-defined instructions", "Termination"], answer: "Ambiguity" },
+        { text: "A correct algorithm must:", options: ["Run indefinitely", "Produce output for some inputs", "Halt with correct output for every input", "Be written in Java"], answer: "Halt with correct output for every input" },
+        { text: "The input-output relationship is defined in a:", options: ["Programming language", "Computational problem", "Flowchart", "Compiler"], answer: "Computational problem" },
+        { text: "The stage after algorithm design is usually:", options: ["Testing", "Coding", "Evaluation", "Documentation"], answer: "Coding" },
+
+        { text: "Time and space are measures of:", options: ["Programming style", "Algorithm efficiency", "Syntax rules", "Compilation"], answer: "Algorithm efficiency" },
+        { text: "Worst-case efficiency measures:", options: ["Smallest input", "Average input", "Largest possible input", "No input"], answer: "Largest possible input" },
+        { text: "O(1) represents:", options: ["Linear time", "Constant time", "Quadratic time", "Logarithmic time"], answer: "Constant time" },
+        { text: "O(n log n) is typical for:", options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Linear Search"], answer: "Merge Sort" },
+        { text: "A polynomial problem belongs to class:", options: ["NP-Complete", "P", "Exponential", "None"], answer: "P" },
+        { text: "NP problems are:", options: ["Not solvable", "Solvable in polynomial time", "Verifiable in polynomial time", "Infinite problems"], answer: "Verifiable in polynomial time" },
+
+        { text: "Which sorting algorithm uses divide-and-conquer?", options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"], answer: "Merge Sort" },
+        { text: "Quick Sort partitions the list using a:", options: ["Minimum", "Maximum", "Pivot", "Index"], answer: "Pivot" },
+        { text: "Bubble Sort compares:", options: ["Random elements", "Adjacent elements", "First and last elements", "All elements at once"], answer: "Adjacent elements" },
+        { text: "Selection Sort repeatedly selects the:", options: ["First element", "Largest element", "Smallest element", "Middle element"], answer: "Smallest element" },
+        { text: "Which algorithm requires a sorted list?", options: ["Merge Sort", "Quick Sort", "Binary Search", "Bubble Sort"], answer: "Binary Search" },
+
+        { text: "Which language supports object-oriented programming?", options: ["COBOL", "Java", "Assembly", "Machine code"], answer: "Java" },
+        { text: "Procedural programming focuses on:", options: ["Objects", "Logical declarations", "Step-by-step procedures", "Events"], answer: "Step-by-step procedures" },
+        { text: "Prolog is used in:", options: ["Scientific computing", "Artificial Intelligence", "Web development", "Assembly programming"], answer: "Artificial Intelligence" },
+        { text: "Event-driven programming responds to:", options: ["Loops", "Variables", "Events", "Functions"], answer: "Events" },
+        { text: "Functional programming uses:", options: ["Recursion", "Registers", "Binary codes", "Machine instructions"], answer: "Recursion" },
+
+        { text: "Source code is written in:", options: ["Machine code", "Assembly code", "High-level language", "Binary only"], answer: "High-level language" },
+        { text: "Object code is generated during:", options: ["Execution", "Compilation", "Debugging", "Documentation"], answer: "Compilation" },
+        { text: "The linker combines object code with:", options: ["Source code", "Comments", "Necessary libraries", "Input data"], answer: "Necessary libraries" },
+        { text: "Before execution, a program must be:", options: ["Deleted", "Compiled", "Printed", "Encrypted"], answer: "Compiled" },
+
+        { text: "A good variable name should:", options: ["Start with a number", "Be meaningless", "Be descriptive", "Be very long"], answer: "Be descriptive" },
+        { text: "Proper indentation improves:", options: ["Speed", "Readability", "Execution time", "Memory"], answer: "Readability" },
+        { text: "Comments in programs are used for:", options: ["Execution", "Debugging only", "Explanation", "Compilation"], answer: "Explanation" },
+        { text: "Testing helps to:", options: ["Increase bugs", "Remove code", "Minimise errors", "Compile faster"], answer: "Minimise errors" },
+        { text: "Classes should start with:", options: ["Lowercase letter", "Uppercase letter", "Number", "Symbol"], answer: "Uppercase letter" },
+
+        { text: "Scientific computing requires:", options: ["Payroll systems", "Complex calculations", "Social media", "Databases"], answer: "Complex calculations" },
+        { text: "MIS is mainly used for:", options: ["Gaming", "Business management", "Robotics", "Sorting"], answer: "Business management" },
+        { text: "Assembly language is:", options: ["Portable", "Machine dependent", "English-like", "High-level"], answer: "Machine dependent" },
+        { text: "High-level languages are:", options: ["Machine dependent", "Hard to debug", "Portable", "Binary"], answer: "Portable" },
+        { text: "An algorithm must terminate in:", options: ["Infinite time", "Zero time", "Finite time", "Negative time"], answer: "Finite time" },
+
+        { text: "Which is NOT a program development stage?", options: ["Coding", "Testing", "Marketing", "Documentation"], answer: "Marketing" },
+        { text: "The planning stage involves writing:", options: ["Source code", "Algorithm", "Object code", "Machine code"], answer: "Algorithm" },
+        { text: "A bug refers to:", options: ["A hardware fault", "A logical error", "A compiler", "A translator"], answer: "A logical error" },
+        { text: "Which is a low-level language?", options: ["C++", "Java", "Assembly", "Python"], answer: "Assembly" },
+        { text: "Merge Sort time complexity is:", options: ["O(n2)", "O(n log n)", "O(n3)", "O(1)"], answer: "O(n log n)" },
+        { text: "Bubble Sort worst-case complexity is:", options: ["O(n)", "O(log n)", "O(n2)", "O(1)"], answer: "O(n2)" },
+        { text: "Binary Search time complexity is:", options: ["O(n2)", "O(n)", "O(log n)", "O(n log n)"], answer: "O(log n)" },
+        { text: "The output stage comes after:", options: ["Coding", "Compilation", "Editing", "Documentation"], answer: "Compilation" },
+        { text: "Flowcharts are used in:", options: ["Coding", "Design", "Debugging", "Execution"], answer: "Design" },
+        { text: "Order of growth describes:", options: ["File size", "Memory card", "Algorithm efficiency", "Programming language"], answer: "Algorithm efficiency" },
+        { text: "A polynomial-time algorithm runs in:", options: ["Constant time", "Exponential time", "n^k time", "Infinite time"], answer: "n^k time" },
+        { text: "NP-Complete problems are:", options: ["Easy", "Impossible", "Hardest in NP", "Constant"], answer: "Hardest in NP" },
+        { text: "Quick Sort average complexity is:", options: ["O(n2)", "O(n log n)", "O(n)", "O(1)"], answer: "O(n log n)" },
+        { text: "The editor is part of the:", options: ["Algorithm", "Programming environment", "NP problem", "Sorting"], answer: "Programming environment" },
+        { text: "The loader prepares program for:", options: ["Editing", "Debugging", "Execution", "Printing"], answer: "Execution" },
+        { text: "C is mainly used for:", options: ["Systems programming", "Painting", "Music", "Sorting only"], answer: "Systems programming" },
+        { text: "Documentation should be done:", options: ["Only at the end", "During coding", "Before problem analysis", "After execution"], answer: "During coding" },
+        { text: "An algorithm may have:", options: ["Infinite steps", "Multiple solutions", "No output", "No input"], answer: "Multiple solutions" },
+        { text: "High-level languages require:", options: ["No translator", "Assembler only", "Compiler or Interpreter", "Binary input"], answer: "Compiler or Interpreter" },
+        { text: "Programming and Algorithms course focuses on writing __________ programs.", options: ["Complex", "Efficient", "Long", "Difficult"], answer: "Efficient" }
+      ];
+
+      const rawQuestions = [];
+      sectionABlanks.forEach((q, idx) => {
+        rawQuestions.push({
+          id: idx + 1,
+          section: "A",
+          type: "blank",
+          text: q.text,
+          answer: q.answer
+        });
+      });
+      sectionBMcq.forEach((q, idx) => {
+        rawQuestions.push({
+          id: sectionABlanks.length + idx + 1,
+          section: "B",
+          type: "mcq",
+          text: q.text,
+          options: q.options,
+          answer: q.answer
+        });
+      });
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 90 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        localStorage.setItem("lastExamPage", "cit237.html");
+
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = { total: totalQuestions, score: score, results: results };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      localStorage.setItem("lastExamPage", "cit237.html");
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>

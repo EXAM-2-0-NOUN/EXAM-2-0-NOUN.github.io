@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GST 201 Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .page { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 20px; font-weight: 700; }
+      .timer { font-weight: 700; }
+      .layout { display: grid; grid-template-columns: 1fr 290px; gap: 16px; }
+      .card { background: var(--panel); border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; }
+      .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--muted); }
+      .section-badge { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #dbeafe; border-radius: 999px; padding: 4px 10px; }
+      .q-text { font-size: 18px; margin: 14px 0; }
+      .options { display: grid; gap: 10px; }
+      .option { display: flex; gap: 10px; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+      .option:hover { border-color: var(--accent); }
+      .blank-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 15px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; font-weight: 600; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-ghost { background: #e2e8f0; color: var(--ink); }
+      .btn-danger { background: var(--danger); color: #fff; }
+      .progress { margin-top: 10px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .q-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 8px 0; cursor: pointer; }
+      .q-btn.active { border-color: var(--accent); background: #dbeafe; }
+      .q-btn.answered { border-color: var(--ok); background: #dcfce7; }
+
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .grid { grid-template-columns: repeat(8, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">GST 201 Exam (70 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:00:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 70</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 70 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sectionABlanks = [
+        { text: "Nigeria is located in the __________ region of Africa.", answer: "West" },
+        { text: "The amalgamation of Northern and Southern Nigeria took place in __________.", answer: "1914" },
+        { text: "The British Governor-General responsible for the amalgamation was __________.", answer: "Lord Lugard" },
+        { text: "Nigeria gained independence in the year __________.", answer: "1960" },
+        { text: "Culture can be defined as the total way of __________ of a people.", answer: "life" },
+        { text: "Nigeria is made up of over __________ ethnic groups.", answer: "250" },
+        { text: "The three major ethnic groups in Nigeria are Hausa, Yoruba and __________.", answer: "Igbo" },
+        { text: "The traditional political system of the Hausa was known as the __________ system.", answer: "Emirate" },
+        { text: "The Yoruba traditional ruler is called the __________.", answer: "Oba" },
+        { text: "The Igbo traditional political structure was largely __________ in nature.", answer: "acephalous" },
+        { text: "Marriage in Nigeria is regarded as a union between families and not just __________.", answer: "individuals" },
+        { text: "The extended family system is common in __________ society.", answer: "Nigerian" },
+        { text: "Islam was introduced into Northern Nigeria through __________ trade.", answer: "Trans-Saharan" },
+        { text: "Christianity spread widely in Southern Nigeria through __________ activities.", answer: "missionary" },
+        { text: "Indigenous religion in Nigeria involves belief in a supreme being and __________.", answer: "divinities" },
+        { text: "Colonialism in Nigeria officially began after the __________ of 1884–1885.", answer: "Berlin Conference" },
+        { text: "Indirect Rule was successfully practiced in Northern Nigeria because of the presence of __________.", answer: "Emirs" },
+        { text: "The first nationalist political party in Nigeria was the __________.", answer: "NNDP" },
+        { text: "The Nigerian Civil War began in __________.", answer: "1967" },
+        { text: "Nigeria operates a __________ system of government today.", answer: "federal" },
+        { text: "The highest legislative body in Nigeria is the __________.", answer: "National Assembly" },
+        { text: "The Nigerian currency is called the __________.", answer: "Naira" },
+        { text: "The concept of unity in diversity is reflected in Nigeria’s national __________.", answer: "motto" },
+        { text: "Traditional festivals in Nigeria promote cultural __________.", answer: "heritage" },
+        { text: "Socialization is the process by which individuals learn the norms and __________ of their society.", answer: "values" }
+      ];
+
+      const sectionBMcq = [
+        { text: "The amalgamation of Nigeria occurred in:", options: ["1900", "1914", "1960", "1979"], answer: "1914" },
+        { text: "Who amalgamated Nigeria?", options: ["Herbert Macaulay", "Nnamdi Azikiwe", "Lord Lugard", "Tafawa Balewa"], answer: "Lord Lugard" },
+        { text: "Nigeria gained independence in:", options: ["1957", "1960", "1963", "1970"], answer: "1960" },
+        { text: "The Nigerian Civil War lasted from:", options: ["1966–1969", "1967–1970", "1960–1963", "1975–1979"], answer: "1967–1970" },
+        { text: "The Berlin Conference was held in:", options: ["France", "Germany", "Britain", "Portugal"], answer: "Germany" },
+
+        { text: "Culture includes:", options: ["Only language", "Only religion", "Beliefs, values and customs", "Only food"], answer: "Beliefs, values and customs" },
+        { text: "Which of the following is NOT a component of culture?", options: ["Language", "Technology", "Weather", "Religion"], answer: "Weather" },
+        { text: "Socialization begins in the:", options: ["School", "Family", "Church", "Market"], answer: "Family" },
+        { text: "Marriage in traditional Nigerian society is mainly for:", options: ["Entertainment", "Political campaigns", "Procreation and family continuity", "Tourism"], answer: "Procreation and family continuity" },
+        { text: "The extended family system encourages:", options: ["Individualism", "Isolation", "Collective responsibility", "Competition"], answer: "Collective responsibility" },
+
+        { text: "The traditional Hausa political system was:", options: ["Republican", "Monarchical", "Democratic", "Socialist"], answer: "Monarchical" },
+        { text: "The Yoruba political system was headed by the:", options: ["Emir", "Oba", "Obi", "Sultan"], answer: "Oba" },
+        { text: "The Igbo traditional system was mainly:", options: ["Centralized", "Monarchical", "Acephalous", "Military"], answer: "Acephalous" },
+        { text: "Indirect Rule worked best in:", options: ["Eastern Nigeria", "Western Nigeria", "Northern Nigeria", "Southern Nigeria"], answer: "Northern Nigeria" },
+        { text: "The Emir is a traditional ruler among the:", options: ["Yoruba", "Igbo", "Hausa", "Tiv"], answer: "Hausa" },
+
+        { text: "Islam spread to Nigeria mainly through:", options: ["Missionaries", "Traders", "Soldiers", "Farmers"], answer: "Traders" },
+        { text: "Christianity was introduced mainly by:", options: ["Traders", "Emirs", "Missionaries", "Hunters"], answer: "Missionaries" },
+        { text: "Indigenous religion in Nigeria believes in:", options: ["No god", "One supreme God and divinities", "Only ancestors", "Only spirits"], answer: "One supreme God and divinities" },
+        { text: "Religious tolerance promotes:", options: ["Conflict", "Unity", "War", "Isolation"], answer: "Unity" },
+        { text: "Festivals in Nigeria are associated with:", options: ["Culture and religion", "Politics only", "Trade only", "Technology"], answer: "Culture and religion" },
+
+        { text: "Nigeria operates a:", options: ["Parliamentary system", "Monarchical system", "Federal system", "Military system"], answer: "Federal system" },
+        { text: "The National Assembly consists of:", options: ["Senate only", "House of Reps only", "Senate and House of Representatives", "Governors only"], answer: "Senate and House of Representatives" },
+        { text: "The Nigerian currency is:", options: ["Dollar", "Pound", "Naira", "Cedi"], answer: "Naira" },
+        { text: "National integration promotes:", options: ["Division", "Unity", "Ethnic rivalry", "Isolation"], answer: "Unity" },
+        { text: "Federalism allows for:", options: ["Centralized power only", "Power sharing between levels of government", "Military rule", "No constitution"], answer: "Power sharing between levels of government" },
+
+        { text: "Ethnicity refers to:", options: ["Religious group", "Cultural identity", "Political party", "Occupation"], answer: "Cultural identity" },
+        { text: "Colonialism aimed primarily at:", options: ["Development of Africa", "Economic exploitation", "Tourism", "Education only"], answer: "Economic exploitation" },
+        { text: "The Nigerian coat of arms symbolizes:", options: ["Division", "Unity and strength", "War", "Weakness"], answer: "Unity and strength" },
+        { text: "The green colour in Nigeria’s flag represents:", options: ["Peace", "Agriculture", "Wealth", "Religion"], answer: "Agriculture" },
+        { text: "Traditional rulers today serve mainly as:", options: ["Military heads", "Cultural leaders", "Presidents", "Judges"], answer: "Cultural leaders" },
+        { text: "The concept of “unity in diversity” means:", options: ["One culture only", "Acceptance of cultural differences", "Elimination of tribes", "Military control"], answer: "Acceptance of cultural differences" },
+        { text: "Urbanization leads to:", options: ["Rural settlement", "City growth", "Cultural extinction", "Farming only"], answer: "City growth" },
+        { text: "Nationalism in Nigeria was strengthened by:", options: ["Colonial masters", "Missionaries", "Educated elites", "Traders only"], answer: "Educated elites" },
+        { text: "One major effect of colonialism was:", options: ["Total cultural preservation", "Introduction of Western education", "End of trade", "Elimination of religion"], answer: "Introduction of Western education" },
+        { text: "The head of state in Nigeria is the:", options: ["Governor", "President", "Emir", "Oba"], answer: "President" },
+        { text: "Nigeria became a republic in:", options: ["1960", "1963", "1979", "1999"], answer: "1963" },
+        { text: "Indigenous languages promote:", options: ["Cultural identity", "War", "Colonialism", "Division"], answer: "Cultural identity" },
+        { text: "Which is NOT a major ethnic group in Nigeria?", options: ["Hausa", "Yoruba", "Igbo", "Zulu"], answer: "Zulu" },
+        { text: "The family is a primary agent of:", options: ["Colonization", "Socialization", "Industrialization", "Urbanization"], answer: "Socialization" },
+        { text: "National development depends on:", options: ["Conflict", "Cooperation", "Isolation", "Division"], answer: "Cooperation" },
+        { text: "A centralized political system has:", options: ["No leader", "One central authority", "Many equal leaders", "No laws"], answer: "One central authority" },
+        { text: "The Tiv people are mainly found in:", options: ["Northern Nigeria", "Western Nigeria", "Benue area", "Lagos"], answer: "Benue area" },
+        { text: "Cultural diffusion refers to:", options: ["Cultural isolation", "Spread of culture", "Cultural extinction", "Cultural war"], answer: "Spread of culture" },
+        { text: "One function of culture is to provide:", options: ["Confusion", "Identity", "Conflict", "Instability"], answer: "Identity" },
+        { text: "Peaceful coexistence enhances:", options: ["National unity", "Civil war", "Division", "Political crisis"], answer: "National unity" }
+      ];
+
+      const rawQuestions = [];
+      sectionABlanks.forEach((q, idx) => {
+        rawQuestions.push({
+          id: idx + 1,
+          section: "A",
+          type: "blank",
+          text: q.text,
+          answer: q.answer
+        });
+      });
+      sectionBMcq.forEach((q, idx) => {
+        rawQuestions.push({
+          id: sectionABlanks.length + idx + 1,
+          section: "B",
+          type: "mcq",
+          text: q.text,
+          options: q.options,
+          answer: q.answer
+        });
+      });
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 60 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        localStorage.setItem("lastExamPage", "gst201.html");
+
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = { total: totalQuestions, score: score, results: results };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      localStorage.setItem("lastExamPage", "gst201.html");
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Operating Systems Exam</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --ok: #16a34a;
+        --danger: #dc2626;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 24px auto;
+        padding: 0 16px 32px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .timer {
+        font-weight: 700;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 290px;
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--panel);
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 18px;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--muted);
+      }
+
+      .section-badge {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1d4ed8;
+        background: #dbeafe;
+        border-radius: 999px;
+        padding: 4px 10px;
+      }
+
+      .q-text {
+        font-size: 18px;
+        margin: 14px 0;
+      }
+
+      .options {
+        display: grid;
+        gap: 10px;
+      }
+
+      .option {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .option:hover {
+        border-color: var(--accent);
+      }
+
+      .blank-input {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 9px 12px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-ghost {
+        background: #e2e8f0;
+        color: var(--ink);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      .progress {
+        margin-top: 10px;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+
+      .q-btn {
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 8px 0;
+        cursor: pointer;
+      }
+
+      .q-btn.active {
+        border-color: var(--accent);
+        background: #dbeafe;
+      }
+
+      .q-btn.answered {
+        border-color: var(--ok);
+        background: #dcfce7;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .grid {
+          grid-template-columns: repeat(8, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="title">Operating Systems Exam (100 Questions)</div>
+        <div class="timer">Time Left: <span id="timer">01:30:00</span></div>
+      </div>
+
+      <div class="layout">
+        <div class="card">
+          <div class="meta">
+            <div id="questionLabel">Question 1 / 100</div>
+            <div class="section-badge" id="sectionBadge">Section A</div>
+          </div>
+          <div class="q-text" id="questionText"></div>
+          <div class="options" id="options"></div>
+          <div class="controls">
+            <button class="btn-ghost" id="prevBtn">Previous</button>
+            <button class="btn-primary" id="nextBtn">Next</button>
+            <button class="btn-danger" id="finishBtn">Finish Exam</button>
+          </div>
+          <div class="progress" id="progress">0 / 100 answered</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight: 700; margin-bottom: 10px">Jump to Question</div>
+          <div class="grid" id="questionGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const rawQuestions = [
+        { id: 1, section: "A", type: "blank", text: "An Operating System (OS) is a set of programs that manages __________ and __________ resources of a computer.", answer: "hardware and software" },
+        { id: 2, section: "A", type: "blank", text: "The core part of an operating system that remains in memory is called the __________.", answer: "kernel" },
+        { id: 3, section: "A", type: "blank", text: "The OS acts as an interface between the user and the computer __________.", answer: "hardware" },
+        { id: 4, section: "A", type: "blank", text: "The process of assigning CPU time to processes is called __________ scheduling.", answer: "CPU" },
+        { id: 5, section: "A", type: "blank", text: "A process is a program in __________.", answer: "execution" },
+        { id: 6, section: "A", type: "blank", text: "The data structure that contains information about a process is called __________.", answer: "PCB" },
+        { id: 7, section: "A", type: "blank", text: "A situation where two processes access shared data simultaneously is called __________ condition.", answer: "race" },
+        { id: 8, section: "A", type: "blank", text: "The technique used to ensure only one process accesses critical resources at a time is called __________.", answer: "mutual exclusion" },
+        { id: 9, section: "A", type: "blank", text: "The part of a program where shared data is accessed is called the __________ section.", answer: "critical" },
+        { id: 10, section: "A", type: "blank", text: "Deadlock occurs when each process holds a resource and waits for another process to release a __________.", answer: "resource" },
+        { id: 11, section: "A", type: "blank", text: "The four necessary conditions for deadlock include mutual exclusion, hold and wait, no preemption, and __________ wait.", answer: "circular" },
+        { id: 12, section: "A", type: "blank", text: "Memory that is seen by the program is called __________ address space.", answer: "logical" },
+        { id: 13, section: "A", type: "blank", text: "The actual location in memory is called __________ address space.", answer: "physical" },
+        { id: 14, section: "A", type: "blank", text: "The technique of dividing memory into fixed-size blocks is called __________.", answer: "paging" },
+        { id: 15, section: "A", type: "blank", text: "Dividing memory into variable-sized blocks is called __________.", answer: "segmentation" },
+        { id: 16, section: "A", type: "blank", text: "Wasted memory inside allocated partitions is called __________ fragmentation.", answer: "internal" },
+        { id: 17, section: "A", type: "blank", text: "Wasted memory outside allocated partitions is called __________ fragmentation.", answer: "external" },
+        { id: 18, section: "A", type: "blank", text: "The technique used to eliminate external fragmentation is called __________.", answer: "compaction" },
+        { id: 19, section: "A", type: "blank", text: "A lightweight process is known as a __________.", answer: "thread" },
+        { id: 20, section: "A", type: "blank", text: "The execution of multiple programs at the same time is called __________.", answer: "multiprogramming" },
+        { id: 21, section: "A", type: "blank", text: "The earliest computers operated without an __________ system.", answer: "operating" },
+        { id: 22, section: "A", type: "blank", text: "In time-sharing systems, CPU time is divided into small units called __________.", answer: "time slices" },
+        { id: 23, section: "A", type: "blank", text: "A system that responds within a fixed time constraint is called a __________ time system.", answer: "real" },
+        { id: 24, section: "A", type: "blank", text: "A disk operating system primarily manages __________ storage devices.", answer: "secondary" },
+        { id: 25, section: "A", type: "blank", text: "The technique of loading a program only when needed is called __________ loading.", answer: "dynamic" },
+        { id: 26, section: "A", type: "blank", text: "Linking library routines during execution time is called __________ linking.", answer: "dynamic" },
+        { id: 27, section: "A", type: "blank", text: "The scheduler that selects processes from the ready queue is called the __________ scheduler.", answer: "short-term" },
+        { id: 28, section: "A", type: "blank", text: "The state in which a process is waiting for CPU is called __________ state.", answer: "ready" },
+        { id: 29, section: "A", type: "blank", text: "The state in which a process has finished execution is called __________ state.", answer: "terminated" },
+        { id: 30, section: "A", type: "blank", text: "A group of cooperating processes sharing data is called __________ processes.", answer: "cooperating" },
+        { id: 31, section: "A", type: "blank", text: "Communication between processes is known as __________ communication.", answer: "interprocess" },
+        { id: 32, section: "A", type: "blank", text: "Message passing and shared memory are types of __________ mechanisms.", answer: "IPC" },
+        { id: 33, section: "A", type: "blank", text: "The OS function that keeps track of resource usage is called __________.", answer: "accounting" },
+        { id: 34, section: "A", type: "blank", text: "The OS goal of improving performance is known as system __________.", answer: "efficiency" },
+        { id: 35, section: "A", type: "blank", text: "The earliest mode of operation without OS was called __________ shop.", answer: "serial" },
+        { id: 36, section: "A", type: "blank", text: "A computer system that allows multiple users simultaneously is called a __________ system.", answer: "multi-user" },
+        { id: 37, section: "A", type: "blank", text: "The algorithm that gives CPU to the shortest job first is called __________ scheduling.", answer: "SJF" },
+        { id: 38, section: "A", type: "blank", text: "A system that processes jobs in batches is called a __________ processing system.", answer: "batch" },
+        { id: 39, section: "A", type: "blank", text: "A request made by a program to the OS is called a system __________.", answer: "call" },
+        { id: 40, section: "A", type: "blank", text: "The swapping of processes between main memory and disk is called __________.", answer: "swapping" },
+
+        { id: 41, section: "B", type: "mcq", text: "The primary function of an operating system is to:", options: ["Compile programs", "Manage system resources", "Design hardware", "Create software"], answer: "Manage system resources" },
+        { id: 42, section: "B", type: "mcq", text: "Which of the following is NOT a function of OS?", options: ["Memory management", "Process management", "Virus creation", "File management"], answer: "Virus creation" },
+        { id: 43, section: "B", type: "mcq", text: "The part of OS that interacts directly with hardware is:", options: ["Compiler", "Kernel", "Shell", "Editor"], answer: "Kernel" },
+        { id: 44, section: "B", type: "mcq", text: "Which generation introduced transistors?", options: ["Zeroth", "First", "Second", "Third"], answer: "Second" },
+        { id: 45, section: "B", type: "mcq", text: "The first computers operated using:", options: ["Integrated circuits", "Vacuum tubes", "Microprocessors", "RAM"], answer: "Vacuum tubes" },
+        { id: 46, section: "B", type: "mcq", text: "Multiprogramming increases:", options: ["CPU idle time", "Resource utilization", "Hardware cost", "Memory size"], answer: "Resource utilization" },
+        { id: 47, section: "B", type: "mcq", text: "A process in execution is in:", options: ["Ready state", "New state", "Running state", "Waiting state"], answer: "Running state" },
+        { id: 48, section: "B", type: "mcq", text: "Round Robin scheduling is:", options: ["Preemptive", "Non-preemptive", "Priority-based only", "Deadlock-free"], answer: "Preemptive" },
+        { id: 49, section: "B", type: "mcq", text: "Which is NOT a deadlock condition?", options: ["Mutual exclusion", "Circular wait", "Preemption", "Hold and wait"], answer: "Preemption" },
+        { id: 50, section: "B", type: "mcq", text: "Paging eliminates:", options: ["Internal fragmentation", "External fragmentation", "Deadlock", "Starvation"], answer: "External fragmentation" },
+        { id: 51, section: "B", type: "mcq", text: "Segmentation divides memory into:", options: ["Equal parts", "Fixed blocks", "Logical units", "Random blocks"], answer: "Logical units" },
+        { id: 52, section: "B", type: "mcq", text: "Threads share:", options: ["Separate memory", "CPU registers only", "Address space", "Disk space"], answer: "Address space" },
+        { id: 53, section: "B", type: "mcq", text: "Which scheduling algorithm may cause starvation?", options: ["FCFS", "Round Robin", "Priority Scheduling", "FIFO"], answer: "Priority Scheduling" },
+        { id: 54, section: "B", type: "mcq", text: "A deadlock avoidance algorithm is:", options: ["Round Robin", "Banker's Algorithm", "FCFS", "Paging"], answer: "Banker's Algorithm" },
+        { id: 55, section: "B", type: "mcq", text: "Critical section problem requires:", options: ["Deadlock", "Mutual exclusion", "Paging", "Linking"], answer: "Mutual exclusion" },
+        { id: 56, section: "B", type: "mcq", text: "Which is a real-time OS example?", options: ["Batch system", "Embedded system", "DOS", "Compiler"], answer: "Embedded system" },
+        { id: 57, section: "B", type: "mcq", text: "The OS service that detects errors is:", options: ["Accounting", "Error detection", "Scheduling", "Swapping"], answer: "Error detection" },
+        { id: 58, section: "B", type: "mcq", text: "Swapping moves processes between:", options: ["CPU and RAM", "RAM and Disk", "Cache and CPU", "Registers and RAM"], answer: "RAM and Disk" },
+        { id: 59, section: "B", type: "mcq", text: "Internal fragmentation occurs in:", options: ["Paging", "Segmentation", "Deadlock", "Scheduling"], answer: "Paging" },
+        { id: 60, section: "B", type: "mcq", text: "External fragmentation occurs in:", options: ["Fixed partitions", "Contiguous allocation", "Paging", "Threads"], answer: "Contiguous allocation" },
+
+        { id: 61, section: "B", type: "mcq", text: "OS improves system efficiency through:", options: ["Scheduling", "Deleting files", "Formatting disk", "Compiling"], answer: "Scheduling" },
+        { id: 62, section: "B", type: "mcq", text: "A process waiting for I/O is in:", options: ["Ready", "Waiting", "Running", "Terminated"], answer: "Waiting" },
+        { id: 63, section: "B", type: "mcq", text: "The shortest job first algorithm is:", options: ["SJF", "FCFS", "RR", "FIFO"], answer: "SJF" },
+        { id: 64, section: "B", type: "mcq", text: "Time-sharing systems are:", options: ["Batch", "Interactive", "Offline", "Manual"], answer: "Interactive" },
+        { id: 65, section: "B", type: "mcq", text: "PCB stores:", options: ["File data", "Process info", "Disk blocks", "Virus codes"], answer: "Process info" },
+        { id: 66, section: "B", type: "mcq", text: "Preemptive scheduling allows:", options: ["CPU takeover", "No interruption", "Deadlock", "Swapping"], answer: "CPU takeover" },
+        { id: 67, section: "B", type: "mcq", text: "Kernel mode is also called:", options: ["User mode", "Supervisor mode", "Debug mode", "Test mode"], answer: "Supervisor mode" },
+        { id: 68, section: "B", type: "mcq", text: "DOS stands for:", options: ["Disk Operating System", "Data Operating System", "Direct OS", "Distributed OS"], answer: "Disk Operating System" },
+        { id: 69, section: "B", type: "mcq", text: "In deadlock prevention, we break one of the ______ conditions.", options: ["four", "three", "five", "six"], answer: "four" },
+        { id: 70, section: "B", type: "mcq", text: "Overlays help in:", options: ["CPU scheduling", "Running large programs in small memory", "Paging", "Linking"], answer: "Running large programs in small memory" },
+        { id: 71, section: "B", type: "mcq", text: "Address binding can occur at:", options: ["Compile time", "Load time", "Execution time", "All of the above"], answer: "All of the above" },
+        { id: 72, section: "B", type: "mcq", text: "Logical address is generated by:", options: ["CPU", "Disk", "RAM", "Printer"], answer: "CPU" },
+        { id: 73, section: "B", type: "mcq", text: "Physical address is seen by:", options: ["Program", "User", "Memory unit", "Compiler"], answer: "Memory unit" },
+        { id: 74, section: "B", type: "mcq", text: "FCFS stands for:", options: ["First Come First Serve", "Fast CPU First Serve", "File Control First Serve", "First CPU First System"], answer: "First Come First Serve" },
+        { id: 75, section: "B", type: "mcq", text: "Banker's algorithm is used for:", options: ["Scheduling", "Deadlock avoidance", "Paging", "Linking"], answer: "Deadlock avoidance" },
+        { id: 76, section: "B", type: "mcq", text: "Mutual exclusion can be implemented using:", options: ["Semaphores", "Paging", "Linking", "Threads"], answer: "Semaphores" },
+        { id: 77, section: "B", type: "mcq", text: "Context switching occurs when:", options: ["OS changes process", "File opens", "Memory loads", "Disk reads"], answer: "OS changes process" },
+        { id: 78, section: "B", type: "mcq", text: "The ready queue contains processes in:", options: ["Running state", "Waiting state", "Ready state", "Terminated state"], answer: "Ready state" },
+        { id: 79, section: "B", type: "mcq", text: "Starvation is common in:", options: ["Round Robin", "Priority Scheduling", "FCFS", "Paging"], answer: "Priority Scheduling" },
+        { id: 80, section: "B", type: "mcq", text: "Which is not memory allocation technique?", options: ["Paging", "Segmentation", "Scheduling", "Contiguous allocation"], answer: "Scheduling" },
+        { id: 81, section: "B", type: "mcq", text: "Time quantum is used in:", options: ["FCFS", "SJF", "Round Robin", "Banker"], answer: "Round Robin" },
+        { id: 82, section: "B", type: "mcq", text: "Multiprocessing uses:", options: ["One CPU", "Multiple CPUs", "No CPU", "Disk only"], answer: "Multiple CPUs" },
+        { id: 83, section: "B", type: "mcq", text: "OS manages:", options: ["CPU", "Memory", "I/O", "All of the above"], answer: "All of the above" },
+        { id: 84, section: "B", type: "mcq", text: "Batch processing is suitable for:", options: ["Real-time tasks", "Payroll", "Interactive tasks", "Gaming"], answer: "Payroll" },
+        { id: 85, section: "B", type: "mcq", text: "Interrupts help in:", options: ["Polling", "CPU notification", "Linking", "Paging"], answer: "CPU notification" },
+        { id: 86, section: "B", type: "mcq", text: "Thrashing occurs due to:", options: ["Excessive paging", "Deadlock", "Scheduling", "Linking"], answer: "Excessive paging" },
+        { id: 87, section: "B", type: "mcq", text: "A zombie process is:", options: ["Active", "Completed but not removed", "Waiting", "New"], answer: "Completed but not removed" },
+        { id: 88, section: "B", type: "mcq", text: "Semaphore was introduced by:", options: ["Turing", "Dijkstra", "Tanenbaum", "Galvin"], answer: "Dijkstra" },
+        { id: 89, section: "B", type: "mcq", text: "Time-sharing improves:", options: ["Interactivity", "Fragmentation", "Deadlock", "Linking"], answer: "Interactivity" },
+        { id: 90, section: "B", type: "mcq", text: "OS protects system through:", options: ["Authentication", "Scheduling", "Paging", "Linking"], answer: "Authentication" },
+        { id: 91, section: "B", type: "mcq", text: "Device drivers are part of:", options: ["Kernel", "User program", "Compiler", "Database"], answer: "Kernel" },
+        { id: 92, section: "B", type: "mcq", text: "The longest job first scheduling is:", options: ["LJF", "SJF", "RR", "FIFO"], answer: "LJF" },
+        { id: 93, section: "B", type: "mcq", text: "Segmentation supports:", options: ["Logical view", "Fixed size", "Equal size", "No division"], answer: "Logical view" },
+        { id: 94, section: "B", type: "mcq", text: "Paging uses:", options: ["Pages and Frames", "Segments only", "Files", "Threads"], answer: "Pages and Frames" },
+        { id: 95, section: "B", type: "mcq", text: "A multi-user system allows:", options: ["One user", "Multiple users", "No user", "Offline user"], answer: "Multiple users" },
+        { id: 96, section: "B", type: "mcq", text: "OS evolution was influenced by:", options: ["Hardware", "Compiler", "Printer", "Mouse"], answer: "Hardware" },
+        { id: 97, section: "B", type: "mcq", text: "First generation used:", options: ["Transistors", "Vacuum tubes", "ICs", "Microchips"], answer: "Vacuum tubes" },
+        { id: 98, section: "B", type: "mcq", text: "Third generation used:", options: ["ICs", "Vacuum tubes", "Manual switches", "Punch cards only"], answer: "ICs" },
+        { id: 99, section: "B", type: "mcq", text: "The shell provides:", options: ["Hardware control", "User interface", "Scheduling", "Paging"], answer: "User interface" },
+        { id: 100, section: "B", type: "mcq", text: "The main goal of OS is:", options: ["Convenience and efficiency", "Virus creation", "Hardware damage", "Printing only"], answer: "Convenience and efficiency" }
+      ];
+
+      const sectionAAnswers = [
+        "hardware and software",
+        "kernel",
+        "hardware",
+        "CPU",
+        "execution",
+        "Process Control Block (PCB)",
+        "race",
+        "mutual exclusion",
+        "critical",
+        "resource",
+        "circular",
+        "logical",
+        "physical",
+        "paging",
+        "segmentation",
+        "internal",
+        "external",
+        "compaction",
+        "thread",
+        "multiprogramming",
+        "operating",
+        "time slices (time quantum)",
+        "real",
+        "secondary (disk)",
+        "dynamic",
+        "dynamic",
+        "short-term",
+        "ready",
+        "terminated",
+        "cooperating",
+        "interprocess (IPC)",
+        "communication",
+        "accounting",
+        "efficiency",
+        "open",
+        "multi-user",
+        "Shortest Job First (SJF)",
+        "batch",
+        "call",
+        "swapping"
+      ];
+
+      const sectionBAnswerLetters = [
+        "B", "C", "B", "C", "B", "B", "C", "A", "C", "B",
+        "C", "C", "C", "B", "B", "B", "B", "B", "A", "B",
+        "A", "B", "A", "B", "B", "A", "B", "A", "A", "B",
+        "D", "A", "C", "A", "B", "A", "A", "C", "B", "C",
+        "C", "B", "D", "B", "B", "A", "B", "B", "A", "A",
+        "A", "A", "A", "A", "B", "A", "B", "A", "B", "A"
+      ];
+
+      rawQuestions.forEach((q) => {
+        if (q.id >= 1 && q.id <= 40) {
+          q.answer = sectionAAnswers[q.id - 1];
+          return;
+        }
+        if (q.id >= 41 && q.id <= 100 && Array.isArray(q.options)) {
+          const letter = sectionBAnswerLetters[q.id - 41];
+          const optionIndex = letter.charCodeAt(0) - 65;
+          if (optionIndex >= 0 && optionIndex < q.options.length) {
+            q.answer = q.options[optionIndex];
+          }
+        }
+      });
+
+      function shuffleArray(input) {
+        const arr = input.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      const questions = shuffleArray(rawQuestions);
+      const totalQuestions = questions.length;
+      const answers = new Array(totalQuestions).fill("");
+
+      let currentIndex = 0;
+      let remainingSeconds = 90 * 60;
+
+      const timerEl = document.getElementById("timer");
+      const questionLabelEl = document.getElementById("questionLabel");
+      const sectionBadgeEl = document.getElementById("sectionBadge");
+      const questionTextEl = document.getElementById("questionText");
+      const optionsEl = document.getElementById("options");
+      const progressEl = document.getElementById("progress");
+      const questionGridEl = document.getElementById("questionGrid");
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const finishBtn = document.getElementById("finishBtn");
+
+      function formatTime(sec) {
+        const hh = String(Math.floor(sec / 3600)).padStart(2, "0");
+        const mm = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+        const ss = String(sec % 60).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function isAnswered(value) {
+        return String(value || "").trim().length > 0;
+      }
+
+      function updateProgress() {
+        const done = answers.filter((a) => isAnswered(a)).length;
+        progressEl.textContent = done + " / " + totalQuestions + " answered";
+      }
+
+      function updateGridState() {
+        const buttons = questionGridEl.querySelectorAll(".q-btn");
+        buttons.forEach((btn, idx) => {
+          btn.classList.toggle("active", idx === currentIndex);
+          btn.classList.toggle("answered", isAnswered(answers[idx]));
+        });
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        questionLabelEl.textContent = "Question " + (index + 1) + " / " + totalQuestions;
+        sectionBadgeEl.textContent = q.section === "A" ? "Section A - Fill Blank" : "Section B - MCQ";
+        questionTextEl.textContent = q.text;
+        optionsEl.innerHTML = "";
+
+        if (q.type === "mcq") {
+          q.options.forEach((opt, optIndex) => {
+            const label = document.createElement("label");
+            label.className = "option";
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "q_" + index;
+            input.value = opt;
+            input.checked = answers[index] === opt;
+            input.addEventListener("change", () => {
+              answers[index] = opt;
+              updateProgress();
+              updateGridState();
+            });
+
+            const span = document.createElement("span");
+            span.textContent = String.fromCharCode(65 + optIndex) + ". " + opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsEl.appendChild(label);
+          });
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "blank-input";
+          input.placeholder = "Type your answer here...";
+          input.value = answers[index] || "";
+          input.addEventListener("input", (event) => {
+            answers[index] = event.target.value;
+            updateProgress();
+            updateGridState();
+          });
+          optionsEl.appendChild(input);
+        }
+
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === totalQuestions - 1;
+        updateGridState();
+      }
+
+      function createGrid() {
+        questionGridEl.innerHTML = "";
+        for (let i = 0; i < totalQuestions; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "q-btn";
+          btn.textContent = String(i + 1);
+          btn.addEventListener("click", () => {
+            currentIndex = i;
+            renderQuestion(currentIndex);
+          });
+          questionGridEl.appendChild(btn);
+        }
+      }
+
+      function finishExam() {
+        const results = questions.map((q, idx) => {
+          const selected = String(answers[idx] || "").trim();
+          const correct = String(q.answer || "").trim();
+          const isCorrect = selected.toLowerCase() === correct.toLowerCase();
+          return {
+            id: q.id,
+            text: q.text,
+            options: q.type === "mcq" ? q.options : [],
+            selected: selected,
+            correct: correct,
+            isCorrect: isCorrect
+          };
+        });
+
+        const score = results.filter((r) => r.isCorrect).length;
+        const payload = {
+          total: totalQuestions,
+          score: score,
+          results: results
+        };
+        localStorage.setItem("examResults", JSON.stringify(payload));
+        window.location.href = "results.html";
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < totalQuestions - 1) {
+          currentIndex += 1;
+          renderQuestion(currentIndex);
+        }
+      });
+
+      finishBtn.addEventListener("click", finishExam);
+
+      setInterval(() => {
+        timerEl.textContent = formatTime(remainingSeconds);
+        if (remainingSeconds <= 0) {
+          finishExam();
+          return;
+        }
+        remainingSeconds -= 1;
+      }, 1000);
+
+      createGrid();
+      renderQuestion(currentIndex);
+      updateProgress();
+      timerEl.textContent = formatTime(remainingSeconds);
+    </script>
+  </body>
+</html>
